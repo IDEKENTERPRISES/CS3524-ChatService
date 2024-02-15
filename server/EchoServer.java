@@ -45,7 +45,7 @@ public class EchoServer {
      * @throws IOException If an I/O error occurs when waiting for a connection.
      */
     private void awaitClient() throws IOException {
-        System.out.println("Waiting for client...");
+        System.out.println("Listening for client connections on port " + this.port + "...");
         Socket socket = this.serverSocket.accept(); // Accepts a connection from a client.
 
         System.out.println("Client connected.");

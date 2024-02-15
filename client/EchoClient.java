@@ -50,6 +50,8 @@ public class EchoClient {
             System.out.println("Aborting...");
             throw new IOException(e);
         }
+
+        System.out.println("Connected to server at " + this.host + ":" + this.port);
     }
 
     /**
@@ -72,6 +74,7 @@ public class EchoClient {
      */
     public void run() {
         try {
+            System.out.println("Attempting to connect to server at " + this.host + ":" + this.port + "...");
             // Connect to the server.
             this.connect();
             // Create a Scanner to read user input.

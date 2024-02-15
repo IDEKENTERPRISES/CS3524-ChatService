@@ -6,10 +6,22 @@ package server;
  */
 public class RunEchoServer {
     public static void main(String[] args) {
-        // The port number on which the server will listen for incoming connections.
-        // The value 50000 is used here as an example, but in a real-world scenario,
-        // this could be passed as a command-line argument or read from a configuration file.
-        int port = 50000;
+
+        // Ask server admin port number on which the server will listen for incoming connections.
+        int port = 42096;
+
+        try {
+            // Ask for new port number
+            String portStr = System.console().readLine("Enter server port number (default 42069): ");
+
+            if (!portStr.isEmpty()) {
+                // New port number provided
+                port = Integer.parseInt(portStr);
+            }
+        } catch (NumberFormatException e) {
+            // Invalid port number
+            System.out.println("Invalid port number. Using default port.");
+        }
 
         // Create an instance of the EchoServer with the specified port number.
         EchoServer server = new EchoServer(port);
