@@ -1,1 +1,1 @@
-java -cp ./out client.RunEchoClient
+java -cp ./out client.RunClient

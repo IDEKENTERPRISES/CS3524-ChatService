@@ -1,1 +1,1 @@
-java -cp ./out server.RunEchoServer
+java -cp ./out server.RunServer
