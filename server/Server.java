@@ -12,7 +12,7 @@ import java.net.SocketException;
  * The EchoServer class sets up a server that echoes messages received from clients.
  * It uses TCP/IP sockets for communication.
  */
-public class EchoServer {
+public class Server {
 
     private int port; // Port number on which the server will listen.
     private ObjectInputStream streamFromClient; // Stream to read objects from the client.
@@ -24,7 +24,7 @@ public class EchoServer {
      *
      * @param port The port number for the server to listen on.
      */
-    public EchoServer(int port) {
+    public Server(int port) {
         this.port = port;
         this.streamFromClient = null;
         this.streamToClient = null;

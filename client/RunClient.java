@@ -4,7 +4,7 @@ package client;
  * This class serves as the entry point for the EchoClient application.
  * It creates an instance of EchoClient and starts the client.
  */
-public class RunEchoClient {
+public class RunClient {
     public static void main(String[] args) {
         // Ask user for server hostname and port number
         String hostname = "localhost";
@@ -33,7 +33,7 @@ public class RunEchoClient {
 
         // Create a new EchoClient instance with the given/default hostname and port number.
         // "localhost" indicates that the server is running on the same machine as the client.
-        EchoClient client = new EchoClient(hostname, port);
+        Client client = new Client(hostname, port);
 
         // Start the EchoClient, which will attempt to connect to the server and enable
         // the user to send messages to be echoed back.

@@ -4,7 +4,7 @@ package server;
  * This class is the entry point for starting the EchoServer.
  * It initializes an instance of EchoServer with a specified port and starts the server.
  */
-public class RunEchoServer {
+public class RunServer {
     public static void main(String[] args) {
 
         // Ask server admin port number on which the server will listen for incoming connections.
@@ -24,7 +24,7 @@ public class RunEchoServer {
         }
 
         // Create an instance of the EchoServer with the specified port number.
-        EchoServer server = new EchoServer(port);
+        Server server = new Server(port);
 
         // Start the server to listen for incoming client connections and process messages.
         server.run();

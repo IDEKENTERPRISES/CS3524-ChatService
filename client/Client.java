@@ -11,7 +11,7 @@ import java.util.Scanner;
  * The EchoClient class is used to connect to an EchoServer and send messages which
  * are then echoed back by the server.
  */
-public class EchoClient {
+public class Client {
 
     private String host; // The hostname or IP address of the server.
     private int port; // The port number of the server to connect to.
@@ -25,7 +25,7 @@ public class EchoClient {
      * @param host The hostname or IP address of the server.
      * @param port The port number of the server.
      */
-    public EchoClient(String host, int port) {
+    public Client(String host, int port) {
         this.host = host;
         this.port = port;
         this.socket = null;
@@ -113,7 +113,7 @@ public class EchoClient {
      */
     public static void main(String[] args) {
         // Create an EchoClient instance and start it.
-        EchoClient client = new EchoClient("localhost", 50000);
+        Client client = new Client("localhost", 50000);
         client.run();
     }
 }
