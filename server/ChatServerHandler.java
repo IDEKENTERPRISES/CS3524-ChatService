@@ -1,23 +1,24 @@
 package server;
 
+import shared.Message;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.ref.WeakReference;
 import java.net.Socket;
 
-import shared.Message;
-
 public class ChatServerHandler implements Runnable {
-	private Socket socket;
+	private final Socket socket;
 	private ObjectInputStream inputStream;
 	private ObjectOutputStream outputStream;
-	private WeakReference<ConnectionPool> pool;
+	private final WeakReference<ConnectionPool> pool;
 	private String userName;
 
 	public ChatServerHandler(Socket socket, ConnectionPool connectionPool) {
+		System.out.println("ChatServerHandler created");
 		this.socket = socket;
-		this.pool = new WeakReference<ConnectionPool>(connectionPool);
+		this.pool = new WeakReference<>(connectionPool);
 
 		try {
 			this.inputStream = new ObjectInputStream(socket.getInputStream());
@@ -31,19 +32,36 @@ public class ChatServerHandler implements Runnable {
 	public void run() {
 		try {
 			this.userName = (String) inputStream.readObject();
+			System.out.printf("User %s connected\n", this.userName);
 			while (true) { // TODO should be replaced by a loop with an end condition
 				Message message = (Message) inputStream.readObject();
 				String messageBody = message.getMessageBody();
 				this.userName = message.getUser();
-				System.out.println(message.toString());
+				System.out.println(message);
+				ConnectionPool actualPool = pool.get();
+				if (actualPool == null) {
+					System.out.println("Connection pool is null");
+					break;
+				}
 				if (messageBody.equalsIgnoreCase("exit")) { // TODO refactor this into a separate message type
-					pool.removeUser(this);
+					actualPool.removeUser(this);					
+					break;
+				}
+				actualPool.broadcast(message);
+			}
+		} catch (IOException | ClassNotFoundException e) {
+			e.printStackTrace(); // TODO handle this error
+		} finally {
+			try {
+				this.socket.close();
+			} catch (IOException e) {
+				e.printStackTrace(); // TODO handle this error
+			} finally {
+				ConnectionPool actualPool = pool.get();
+				if (actualPool != null) {
+					actualPool.removeUser(this);
 				}
 			}
-		} catch () {
-
-		} finally {
-
 		}
 	}
 

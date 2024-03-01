@@ -1,5 +1,7 @@
 package client;
 
+import java.util.Scanner;
+
 /**
  * This class serves as the entry point for the EchoClient application.
  * It creates an instance of EchoClient and starts the client.
@@ -7,11 +9,14 @@ package client;
 public class RunClient {
 	public static void main(String[] args) {
 		// Ask user for server hostname and port number
+        Scanner scanner = new Scanner(System.in);
+        // Ask for new port number
 		String hostname = "localhost";
 		int port = 42096;
 
 		// Ask for new hostname
-		String newHostname = System.console().readLine("Enter server hostname (default locahost): ");
+        System.out.print("Enter server hostname (default locahost): ");
+		String newHostname = scanner.nextLine();
 
 		if (!newHostname.isEmpty()) {
 			// New hostname provided
@@ -20,7 +25,8 @@ public class RunClient {
 
 		try {
 			// Ask for new port number
-			String portStr = System.console().readLine("Enter server port number (default 42069): ");
+            System.out.print("Enter server port number (default 42069): ");
+			String portStr = scanner.nextLine();
 
 			if (!portStr.isEmpty()) {
 				// New port number provided

@@ -1,119 +1,173 @@
 package client;
 
+import shared.Message;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
-/**
- * The EchoClient class is used to connect to an EchoServer and send messages which
- * are then echoed back by the server.
- */
 public class Client {
 
-	private String host; // The hostname or IP address of the server.
-	private int port; // The port number of the server to connect to.
-	private Socket socket; // Socket for communicating with the server.
-	private ObjectOutputStream streamToServer; // Stream to send messages to the server.
-	private ObjectInputStream streamFromServer; // Stream to receive messages from the server.
+    private final String host;
+    private final int port;
+    private String username;
+    private Socket socket;
+    private Scanner scanner;
+    private ObjectInputStream inputStream;
+    private ObjectOutputStream outputStream;
+    private Thread listenerThread;
+    private Boolean exitFlag;
 
-	/**
-	 * Constructor to initialize the EchoClient with server details.
-	 *
-	 * @param host The hostname or IP address of the server.
-	 * @param port The port number of the server.
-	 */
-	public Client(String host, int port) {
-		this.host = host;
-		this.port = port;
-		this.socket = null;
-		this.streamToServer = null;
-		this.streamFromServer = null;
-	}
+    public Client(String host, int port) {
+        this.host = host;
+        this.port = port;
+        this.username = null;
+        this.socket = null;
+        this.scanner = null;
+        this.inputStream = null;
+        this.outputStream = null;
+        this.listenerThread = null;
+        this.exitFlag = null;
+    }
 
-	/**
-	 * Establishes a connection to the server and initializes the communication streams.
-	 *
-	 * @throws IOException If an I/O error occurs when creating the socket or streams.
-	 */
-	private void connect() throws IOException {
-		try {
-			// Create a socket and initialize the streams.
-			this.socket = new Socket(this.host, this.port);
-			this.streamToServer = new ObjectOutputStream(this.socket.getOutputStream());
-			this.streamFromServer = new ObjectInputStream(this.socket.getInputStream());
-		} catch (UnknownHostException e) {
-			// Handle unknown host exceptions.
-			System.out.println("Unrecognised host: " + this.host);
-			System.out.println("Aborting...");
-			throw new IOException(e);
-		}
+    private void setup() {
+        System.out.println("Setup started.");
+        try {
+            this.socket = new Socket(this.host, this.port);
+            System.out.println("Connected to server.");
 
-		System.out.println("Connected to server at " + this.host + ":" + this.port);
-	}
+            this.scanner = new Scanner(System.in);
+            this.outputStream = new ObjectOutputStream(
+                this.socket.getOutputStream()
+            );
+            this.inputStream =  new ObjectInputStream(
+                this.socket.getInputStream()
+            );
+            
+            this.exitFlag = false;
+            System.out.println("Setup complete!");
+        } catch (UnknownHostException e) {
+            System.err.println("Unknown host `" + this.host + "`.");
+            this.exitFlag = true;
+        } catch (IOException e) {
+            System.err.println("Could not connect to the server.");
+            this.exitFlag = true; // Close the program here
+        }
+    }
 
-	/**
-	 * Sends a message to the server and prints the server's response.
-	 *
-	 * @param message The message to send to the server.
-	 * @throws IOException            If an I/O error occurs when sending or receiving the message.
-	 * @throws ClassNotFoundException If the class of a serialized object cannot be found.
-	 */
-	private void sendMessageToServer(String message) throws IOException, ClassNotFoundException {
-		// Send the message to the server.
-		this.streamToServer.writeObject(message);
-		// Wait for and print the server's response.
-		String result = (String) this.streamFromServer.readObject();
-		System.out.println("Received from server: " + result);
-	}
+    private void registerUser() {
+        if (this.exitFlag) return; // Ensure successful setup
 
-	/**
-	 * The main client method that handles input from the user and communicates with the server.
-	 */
-	public void run() {
-		try {
-			System.out.println("Attempting to connect to server at " + this.host + ":" + this.port + "...");
-			// Connect to the server.
-			this.connect();
-			// Create a Scanner to read user input.
-			try (Scanner scanner = new Scanner(System.in)) {
-				while (true) {
-					// Prompt the user for a message.
-					System.out.println("Input message here (type 'exit' to quit): ");
-					String message = scanner.nextLine();
-					// Exit the loop if the user types 'exit'.
-					if ("exit".equalsIgnoreCase(message)) {
-						break;
-					}
-					// Send the message to the server.
-					this.sendMessageToServer(message);
-				}
-			}
-		} catch (IOException | ClassNotFoundException e) {
-			// Handle exceptions related to I/O and class resolution.
-			System.out.println("Encountered an error: " + e.getMessage());
-		} finally {
-			// Close all resources upon finishing.
-			try {
-				if (this.streamToServer != null) this.streamToServer.close();
-				if (this.streamFromServer != null) this.streamFromServer.close();
-				if (this.socket != null) this.socket.close();
-			} catch (IOException e) {
-				System.out.println("Error closing resources: " + e.getMessage());
-			}
-		}
-	}
+        System.out.print("Insert user name: ");
+        this.username = this.scanner.nextLine();
+        try {
+            this.outputStream.writeObject(this.username);
+            System.out.println("Registered to server.");
+        } catch (IOException e) {
+            System.err.println("Encountered registering the user.");
+            this.exitFlag = true;
+        }
+    }
 
-	/**
-	 * The entry point of the client application.
-	 *
-	 * @param args Command-line arguments (not used).
-	 */
-	public static void main(String[] args) {
-		// Create an EchoClient instance and start it.
-		Client client = new Client("localhost", 50000);
-		client.run();
-	}
+    private String getUserMessage() {
+        String messageBody = null; // Instantiate the return value
+        System.out.print("Please input >");
+        try {
+            messageBody = this.scanner.nextLine();
+            if (messageBody.equalsIgnoreCase("exit")) {
+                this.exitFlag = true;
+            }
+        } catch (NoSuchElementException e) {
+            // This might be thrown by `this.scanner.nextLine()` if the client 
+            // exits with CTRL-C. In such case exit and return null.
+            this.exitFlag = true;
+        }
+        return messageBody;
+    }
+
+    private void sendUserMessage(String messageString) {
+        try {
+            Message userMessage = new Message(messageString, this.username);
+            this.outputStream.writeObject(userMessage);
+        } catch (IOException e) {
+            System.err.println("Failed communicating with the server.");
+            this.exitFlag = true;
+        }
+    }
+
+    private void handleUserInput() {
+        while(!this.exitFlag) {
+            String messageString = this.getUserMessage();
+            if (messageString != null) { 
+                this.sendUserMessage(messageString);
+            }
+        }
+    }
+
+    private void startListenerThread() {
+        this.listenerThread = new Thread(this::listenToServer);
+        // Daemon thread: terminates when the program has finished.
+        this.listenerThread.setDaemon(true);
+        this.listenerThread.start();
+    }
+
+    private void start() {
+        this.registerUser();
+        this.startListenerThread();
+        this.handleUserInput();
+    }
+
+    private void receiveMessageAndPrint() throws IOException {
+        try {
+            Message inMessage = (Message) this.inputStream.readObject();
+            System.out.print(inMessage.toString());
+        } catch (NullPointerException e) {
+            /* 
+            this.streamFromServer was not initialised. Either:
+            (a) something went wrong during setup, or
+            (b) this.close() was called.
+            In both cases we expect this.exitFlag = true.
+            */
+            this.exitFlag = true;
+        } catch (ClassNotFoundException e) {
+            System.err.println("Could not deserialise the message.");
+        }
+    }
+
+    private void listenToServer() {
+        // keep reading from server and print out.
+        while (true) {
+            try {
+                this.receiveMessageAndPrint();
+            } catch (IOException e) {
+                // Close the listener if the program has exited
+                if (this.exitFlag) break;
+
+                // Otherwise print an error message and keep listening
+                System.err.println("Failed while listening to server.");
+            }
+        }
+    }
+
+    public void run() {
+        this.setup();
+        this.start();
+        this.close();
+    }
+
+    private void close() {
+        System.out.println("Exiting...");
+        try {
+            this.scanner.close();
+            this.socket.close();
+        } catch (NullPointerException e) {
+            // The setup failed, nothing to do here
+        } catch (IOException e) {
+            System.err.println("Failed while closing the socket.");
+        }
+    }
 }

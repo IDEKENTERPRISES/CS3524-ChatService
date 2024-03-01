@@ -1,5 +1,7 @@
 package server;
 
+import java.util.Scanner;
+
 /**
  * This class is the entry point for starting the EchoServer.
  * It initializes an instance of EchoServer with a specified port and starts the server.
@@ -11,9 +13,11 @@ public class RunServer {
 		int port = 42096;
 
 		try {
-			// Ask for new port number
-			String portStr = System.console().readLine("Enter server port number (default 42069): ");
 
+            Scanner scanner = new Scanner(System.in);
+			// Ask for new port number
+            System.out.print("Enter server port number (default 42096): ");
+			String portStr = scanner.nextLine();
 			if (!portStr.isEmpty()) {
 				// New port number provided
 				port = Integer.parseInt(portStr);
