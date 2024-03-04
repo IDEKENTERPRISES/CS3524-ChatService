@@ -42,7 +42,9 @@ public class Server {
 		try {
 			Socket socket = this.serverSocket.accept(); // Accepts a connection from a client.
 			System.out.println("Client connected.");
-			ChatServerHandler handler = new ChatServerHandler(socket, this.pool);
+
+			// Creates a new handler for the client and adds it to the connection pool before returning it.
+			ChatServerHandler handler = new ChatServerHandler(socket, this.pool); 
 			this.pool.addConnection(handler);
 			return handler;
 		} catch (IOException e) {
@@ -61,6 +63,7 @@ public class Server {
 			System.out.println("Server exception: " + e.getMessage()); // Error handling for server setup.
 		}
 		while (true) {
+			// Waits for a client to connect and creates a handler for the client in a new thread.
 			ChatServerHandler handler = this.awaitClient();
 			if (handler == null) {
                 System.out.println("Handler is null...");

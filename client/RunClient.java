@@ -3,8 +3,8 @@ package client;
 import java.util.Scanner;
 
 /**
- * This class serves as the entry point for the EchoClient application.
- * It creates an instance of EchoClient and starts the client.
+ * This class serves as the entry point for the Client Chat Server application.
+ * It creates an instance of RunClient and starts the client.
  */
 public class RunClient {
 	public static void main(String[] args) {
@@ -37,12 +37,11 @@ public class RunClient {
 			System.out.println("Invalid port number. Using default port.");
 		}
 
-		// Create a new EchoClient instance with the given/default hostname and port number.
-		// "localhost" indicates that the server is running on the same machine as the client.
+		// Create an instance of the Client with the specified hostname and port number.
 		Client client = new Client(hostname, port);
 
-		// Start the EchoClient, which will attempt to connect to the server and enable
-		// the user to send messages to be echoed back.
+		// Start the client to connect to the server and send messages.
 		client.run();
+		scanner.close();
 	}
 }
