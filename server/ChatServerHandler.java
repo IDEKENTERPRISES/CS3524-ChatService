@@ -11,8 +11,6 @@ import java.io.ObjectOutputStream;
 import java.lang.ref.WeakReference;
 import java.net.Socket;
 
-import javax.swing.GroupLayout.Group;
-
 public class ChatServerHandler implements Runnable {
 	private final Socket socket;
 	private ObjectInputStream inputStream;
