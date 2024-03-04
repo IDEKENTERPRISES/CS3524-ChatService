@@ -19,7 +19,7 @@ public class ConnectionPool {
             String clientName = handler.getClientName();
              if (clientName != null && !clientName.equals(message.getUser())) {
                 System.out.println("Relaying to " + handler.getClientName());
-                handler.sendMessageToClient(message);
+                handler.sendObjectToClient(message);
             }
         }
     }
@@ -27,5 +27,24 @@ public class ConnectionPool {
     public void removeUser(ChatServerHandler handler) {
         // remove the user's connection handler from pool
         connections.remove(handler);
+    }
+
+    public boolean isUsernameTaken(String username) {
+        for (ChatServerHandler handler: this.connections){
+            if (handler.getClientName() != null && handler.getClientName().equals(username)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public String[] getUserList() {
+        List<String> users = new ArrayList<>();
+        for (ChatServerHandler handler: this.connections){
+            if (handler.getClientName() != null) {
+                users.add(handler.getClientName());
+            }
+        }
+        return users.toArray(new String[0]);
     }
 }

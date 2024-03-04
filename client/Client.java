@@ -1,14 +1,19 @@
 package client;
 
 import shared.Message;
+import shared.Command;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.Arrays;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
+import java.util.StringTokenizer;
+import java.util.NoSuchElementException; // Add missing import statement
+import java.util.NoSuchElementException; // Add missing import statement
 
 public class Client {
 
@@ -65,6 +70,7 @@ public class Client {
         System.out.print("Insert user name: ");
         this.username = this.scanner.nextLine();
         try {
+            
             this.outputStream.writeObject(this.username);
             System.out.println("Registered to server.");
         } catch (IOException e) {
@@ -84,6 +90,7 @@ public class Client {
         } catch (NoSuchElementException e) {
             // This might be thrown by `this.scanner.nextLine()` if the client 
             // exits with CTRL-C. In such case exit and return null.
+            System.err.println("No input received. Exiting...");
             this.exitFlag = true;
         }
         return messageBody;
@@ -91,8 +98,25 @@ public class Client {
 
     private void sendUserMessage(String messageString) {
         try {
-            Message userMessage = new Message(messageString, this.username);
-            this.outputStream.writeObject(userMessage);
+            StringTokenizer tokenizer = new StringTokenizer(messageString);
+
+            if (!tokenizer.hasMoreTokens()) {
+                return;
+            }
+
+            String firstToken = tokenizer.nextToken();
+
+            if (Arrays.asList(Command.keywords).contains(firstToken)) {
+                String[] args = new String[tokenizer.countTokens()];
+                for (int i = 0; i < args.length; i++) {
+                    args[i] = tokenizer.nextToken();
+                }
+                Command userCommand = new Command(firstToken, args, this.username);
+                this.outputStream.writeObject(userCommand);
+            } else {
+                Message userMessage = new Message(messageString, this.username);
+                this.outputStream.writeObject(userMessage);
+            }
         } catch (IOException e) {
             System.err.println("Failed communicating with the server.");
             this.exitFlag = true;
@@ -116,15 +140,51 @@ public class Client {
     }
 
     private void start() {
-        this.registerUser();
+        // this.registerUser();
         this.startListenerThread();
         this.handleUserInput();
     }
 
     private void receiveMessageAndPrint() throws IOException {
         try {
-            Message inMessage = (Message) this.inputStream.readObject();
-            System.out.print(inMessage.toString());
+
+            Object inObject = this.inputStream.readObject();
+            // Message inMessage = (Message) this.inputStream.readObject();
+
+            if (inObject instanceof Message) {
+                Message inMessage = (Message) inObject;
+                System.out.println(inMessage.toString()); // TODO: Fix printing formatting, need to clear line before printing message.
+                System.out.print("Please input >");
+            } else if (inObject instanceof Command) {
+                Command command = (Command) inObject;
+                switch (command.getCommand()) {
+                    case "REGISTER":
+                        if (command.getArgs() != null && command.getArgs().length > 0) {
+                            this.username = command.getArgs()[0];
+                            System.out.println("Registered as " + this.username);
+                        } else {
+                            System.out.println("Failed to register.");
+                        }
+                        break;
+                    case "UNREGISTER":
+                        if (command.getArgs() != null && command.getArgs().length > 0) {
+                            this.username = null;
+                            System.out.println("Unregistered.");
+                        } else {
+                            System.out.println("Failed to unregister.");
+                        }
+                        break;
+                    case "GETUSERS":
+                        if (command.getArgs() != null && command.getArgs().length > 0) {
+                            System.out.println("Users: " + String.join(", ", command.getArgs()));
+                        } else {
+                            System.out.println("Failed to get users.");
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
         } catch (NullPointerException e) {
             /* 
             this.streamFromServer was not initialised. Either:
@@ -132,6 +192,7 @@ public class Client {
             (b) this.close() was called.
             In both cases we expect this.exitFlag = true.
             */
+            System.err.println("Failed to read from server.");
             this.exitFlag = true;
         } catch (ClassNotFoundException e) {
             System.err.println("Could not deserialise the message.");

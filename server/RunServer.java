@@ -11,10 +11,10 @@ public class RunServer {
 
 		// Ask server admin port number on which the server will listen for incoming connections.
 		int port = 42096;
-
+		
+		Scanner scanner = new Scanner(System.in);
 		try {
 
-            Scanner scanner = new Scanner(System.in);
 			// Ask for new port number
             System.out.print("Enter server port number (default 42096): ");
 			String portStr = scanner.nextLine();
@@ -26,7 +26,7 @@ public class RunServer {
 			// Invalid port number
 			System.out.println("Invalid port number. Using default port.");
 		}
-
+		scanner.close();
 		// Create an instance of the EchoServer with the specified port number.
 		Server server = new Server(port);
 
