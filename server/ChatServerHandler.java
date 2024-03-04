@@ -1,6 +1,7 @@
 package server;
 
 import shared.Command;
+import shared.GroupMessage;
 import shared.Message;
 
 import java.io.IOException;
@@ -8,6 +9,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.ref.WeakReference;
 import java.net.Socket;
+
+import javax.swing.GroupLayout.Group;
 
 public class ChatServerHandler implements Runnable {
 	private final Socket socket;
@@ -103,23 +106,128 @@ public class ChatServerHandler implements Runnable {
 							System.out.println("User unregistered");
 							break;
 						case "GETUSERS":
+							if (this.userName == null) {
+								this.sendObjectToClient(
+										new Message("You are not registered, use the REGISTER command.", "SERVER"));
+								break;
+							}
 							// Send a list of all registered users to the client
 							String[] users = actualPool.getUserList();
 							this.sendObjectToClient(new Command("GETUSERS", users, "SERVER"));
+							break;
+						case "SEND":
+							if (this.userName == null) {
+								this.sendObjectToClient(
+										new Message("You are not registered, use the REGISTER command.", "SERVER"));
+								break;
+							}
+							// Send a message to the specified user or group
+							String recipient = command.getArgs()[0];
+							int recipientType = checkRecipients(recipient);
+
+							
+							String messageText = "";
+							for (int i = 1; i < command.getArgs().length; i++) {
+								messageText += command.getArgs()[i] + " ";
+							}
+							messageText = messageText.trim();
+							
+							System.out.println(this.userName + " SENT message to " + recipient + ": " + messageText);
+
+							if (recipientType == -1) {
+								// Send a message to the specified user or group
+								this.sendObjectToClient(new Message("Recipient not found", "SERVER"));
+							} else if (recipientType == 0) {
+								// Send the message to the specified user
+								Message msg = new Message(messageText, this.userName + " (private)");
+								actualPool.sendToUser(msg, recipient);
+							} else if (recipientType == 1) {
+								// Send the message to the specified group
+								GroupMessage msg = new GroupMessage(messageText, this.userName, recipient);
+								boolean groupResult = actualPool.sendToGroup(msg, recipient);
+								if (!groupResult) {
+									this.sendObjectToClient(new Message("Group " + recipient + " does not exist or you are not part of it", "SERVER"));
+								}
+							} else {
+								System.out.println("Unknown recipient type");
+							}
+							break;
+						case "CREATE":
+							if (this.userName == null) {
+								this.sendObjectToClient(
+										new Message("You are not registered, use the REGISTER command.", "SERVER"));
+								break;
+							}
+							// Create a new group
+							String groupName = command.getArgs()[0];
+							boolean createResult = actualPool.createGroup(groupName, this.userName);
+							if (createResult) {
+								this.sendObjectToClient(new Message("Group " + groupName + " created", "SERVER"));
+								System.out.printf("Group %s created by %s\n", groupName, this.userName);
+							} else {
+								this.sendObjectToClient(new Message("Group " + groupName + " already exists", "SERVER"));
+							}
+							break;
+						case "JOIN":
+							if (this.userName == null) {
+								this.sendObjectToClient(
+										new Message("You are not registered, use the REGISTER command.", "SERVER"));
+								break;
+							}
+							// Join an existing group
+							String groupToJoin = command.getArgs()[0];
+							boolean joinResult = actualPool.addUserToGroup(this.userName, groupToJoin);
+							if (joinResult) {
+								this.sendObjectToClient(new Message("You joined group " + groupToJoin, "SERVER"));
+								System.out.printf("User %s joined group %s\n", this.userName, groupToJoin);
+							} else {
+								this.sendObjectToClient(new Message("Group " + groupToJoin + " does not exist or you are already part of it", "SERVER"));
+							}
+							break;
+						case "LEAVE":
+							if (this.userName == null) {
+								this.sendObjectToClient(
+										new Message("You are not registered, use the REGISTER command.", "SERVER"));
+								break;
+							}
+							// Leave a group
+							String groupToLeave = command.getArgs()[0];
+							boolean leaveResult = actualPool.removeUserFromGroup(this.userName, groupToLeave);
+							if (leaveResult) {
+								this.sendObjectToClient(new Message("You left group " + groupToLeave, "SERVER"));
+								System.out.printf("User %s left group %s\n", this.userName, groupToLeave);
+							} else {
+								this.sendObjectToClient(new Message("Group " + groupToLeave + " does not exist or you are not part of it", "SERVER"));
+							}
+							break;
+						case "REMOVE":
+							if (this.userName == null) {
+								this.sendObjectToClient(
+										new Message("You are not registered, use the REGISTER command.", "SERVER"));
+								break;
+							}
+							// Remove a group
+							String groupToRemove = command.getArgs()[0];
+							boolean removeResult = actualPool.removeGroup(groupToRemove);
+							if (removeResult) {
+								this.sendObjectToClient(new Message("Group " + groupToRemove + " removed", "SERVER"));
+								System.out.printf("Group %s removed by %s\n", groupToRemove, this.userName);
+							} else {
+								this.sendObjectToClient(new Message("Group " + groupToRemove + " does not exist", "SERVER"));
+							}
 							break;
 						default:
 							break;
 					}
 				} else if (message instanceof Message) {
 					// Handle message
-
+					Message msg = (Message) message;
 					if (this.getClientName() == null) {
 						this.sendObjectToClient(
 								new Message("You are not registered, use the REGISTER command.", "SERVER"));
 					} else {
 						// Broadcast the message to all connected and registered clients
-						Message msg = (Message) message;
-						System.out.printf(msg.toString());
+						System.out.println(msg.toString());
 						actualPool.broadcast(msg);
 					}
 				} else {
@@ -140,6 +248,27 @@ public class ChatServerHandler implements Runnable {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Checks if the recipients of a message are registered users or groups.
+	 * Recipients are specified in the first word of the message, either a group
+	 * name or a user name.
+	 * Uses StringTokenizer
+	 * 
+	 * @param message
+	 * @return 0 if the recipient is a user, 1 if the recipient is a group, -1 if
+	 *         the recipient is not found
+	 */
+	public int checkRecipients(String recipient) {
+		ConnectionPool actualPool = pool.get();
+		if (actualPool == null) {
+			System.out.println("Connection pool is null");
+			return -1;
+		}
+
+		int recipientType = actualPool.checkRecipient(recipient);
+		return recipientType;
 	}
 
 	/**

@@ -4,19 +4,25 @@ import java.io.Serializable;
 
 public class Command implements Serializable {
     public static final String[] keywords = new String[] {
-        "REGISTER",
-        "UNREGISTER",
-        "GETUSERS"};
+            "REGISTER",
+            "UNREGISTER",
+            "GETUSERS",
+            "SEND",
+            "CREATE",
+            "JOIN",
+            "LEAVE",
+            "REMOVE"};
 
     private final String command;
     private final String[] args;
     private final String username;
 
     /**
-     * Constructs a new Command object with the specified command, arguments, and username.
+     * Constructs a new Command object with the specified command, arguments, and
+     * username.
      *
-     * @param command the command to be executed
-     * @param args the arguments for the command
+     * @param command  the command to be executed
+     * @param args     the arguments for the command
      * @param username the username of the user executing the command
      */
     public Command(String command, String[] args, String username) {
@@ -62,7 +68,7 @@ public class Command implements Serializable {
         String argString = "";
 
         if (this.args != null) {
-            for (String arg: this.args) {
+            for (String arg : this.args) {
                 argString += arg + " ";
             }
         }
