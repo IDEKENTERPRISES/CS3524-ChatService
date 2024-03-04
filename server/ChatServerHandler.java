@@ -1,6 +1,7 @@
 package server;
 
 import shared.Command;
+import shared.DirectMessage;
 import shared.GroupMessage;
 import shared.Message;
 
@@ -139,7 +140,7 @@ public class ChatServerHandler implements Runnable {
 								this.sendObjectToClient(new Message("Recipient not found", "SERVER"));
 							} else if (recipientType == 0) {
 								// Send the message to the specified user
-								Message msg = new Message(messageText, this.userName + " (private)");
+								Message msg = new DirectMessage(messageText, this.userName, recipient);
 								actualPool.sendToUser(msg, recipient);
 							} else if (recipientType == 1) {
 								// Send the message to the specified group
