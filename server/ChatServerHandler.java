@@ -1,9 +1,11 @@
 package server;
 
 import shared.Command;
+import shared.CommandType;
 import shared.DirectMessage;
 import shared.GroupMessage;
 import shared.Message;
+import shared.User;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -16,7 +18,7 @@ public class ChatServerHandler implements Runnable {
 	private ObjectInputStream inputStream;
 	private ObjectOutputStream outputStream;
 	private final WeakReference<ConnectionPool> pool;
-	private String userName;
+	private User user;
 
 	/**
 	 * Constructs a new ChatServerHandler object.
@@ -31,7 +33,7 @@ public class ChatServerHandler implements Runnable {
 		System.out.println("ChatServerHandler created");
 		this.socket = socket;
 		this.pool = new WeakReference<>(connectionPool);
-		this.userName = null;
+		this.user = null;
 
 		try {
 			this.inputStream = new ObjectInputStream(socket.getInputStream());
@@ -53,6 +55,131 @@ public class ChatServerHandler implements Runnable {
 	 * The method also handles exceptions that may occur during the execution and
 	 * closes the socket connection.
 	 */
+
+
+	public void register(ConnectionPool pool, String[] args) {
+		if (args.length != 1) {
+			this.sendObjectToClient(new Message("Invalid number of arguments", pool.SERVER));
+			return;
+		}
+		if (this.user != null) {
+			this.sendObjectToClient(new Message("You are already registered", pool.SERVER));
+			return;
+		}
+		var username = args[0];
+		if (pool.isUsernameTaken(username)) {
+			this.sendObjectToClient(new Message("Username is already taken", pool.SERVER));
+			return;
+		}
+		this.user = new User(username);
+		this.sendObjectToClient(new Command(CommandType.REGISTER, new String[] { username }, pool.SERVER));
+	}
+
+	public void unregister(ConnectionPool pool, String[] args) {
+		if (args.length != 1) {
+			this.sendObjectToClient(new Message("Invalid number of arguments", pool.SERVER));
+			return;
+		}
+		if (this.user == null) {
+			this.sendObjectToClient(new Message("You are not registered", pool.SERVER));
+			return;
+		}
+		this.user = null;
+		this.sendObjectToClient(new Command(CommandType.UNREGISTER, new String[] {}, pool.SERVER));
+	}
+
+	public boolean verifyRegistered(ConnectionPool pool) {
+		if (this.user == null) {
+			this.sendObjectToClient(new Message("You are not registered, use the REGISTER command.", pool.SERVER));
+			return false;
+		}
+		return true;
+	}
+
+	public void getUsers(ConnectionPool pool, String[] args) {
+		if (!this.verifyRegistered(pool)) {
+			return;
+		}
+		String[] users = pool.getUserList();
+		this.sendObjectToClient(new Command(CommandType.GETUSERS, users, this.pool.get().SERVER));
+
+	}
+
+	public void send(ConnectionPool pool, String[] args) {
+		if (!this.verifyRegistered(pool)) {
+			return;
+		}
+		// todo (complicated)
+	}
+
+	public void create(ConnectionPool pool, String[] args) {
+		if (!this.verifyRegistered(pool)) {
+			return;
+		}
+		if (args.length != 1) {
+			this.sendObjectToClient(new Message("Invalid number of arguments", pool.SERVER));
+			return;
+		}
+		var groupName = args[0];
+		if (pool.createGroup(groupName, this.user)) {
+			this.sendObjectToClient(new Message("Group " + groupName + " created", pool.SERVER));
+		} else {
+			this.sendObjectToClient(new Message("Group " + groupName + " already exists", pool.SERVER));
+		}
+	}
+
+	public void join(ConnectionPool pool, String[] args) {
+		if (!this.verifyRegistered(pool)) {
+			return;
+		}
+		if (args.length != 1) {
+			this.sendObjectToClient(new Message("Invalid number of arguments", pool.SERVER));
+			return;
+		}
+		var groupName = args[0];
+		if (pool.addUserToGroup(this.user, groupName)) {
+			this.sendObjectToClient(new Message("You joined group " + groupName, pool.SERVER));
+		} else {
+			this.sendObjectToClient(
+					new Message("Group " + groupName + " does not exist or you are already part of it", pool.SERVER));
+		}
+	}
+
+	public void leave(ConnectionPool pool, String[] args) {
+		if (!this.verifyRegistered(pool)) {
+			return;
+		}
+		if (args.length != 1) {
+			this.sendObjectToClient(new Message("Invalid number of arguments", pool.SERVER));
+			return;
+		}
+		var groupName = args[0];
+		if (pool.removeUserFromGroup(this.user, groupName)) {
+			this.sendObjectToClient(new Message("You left group " + groupName, pool.SERVER));
+		} else {
+			this.sendObjectToClient(
+					new Message("Group " + groupName + " does not exist or you are not part of it", pool.SERVER));
+		}
+	}
+
+	public void remove(ConnectionPool pool, String[] args) {
+		if (!this.verifyRegistered(pool)) {
+			return;
+		}
+		if (args.length != 1) {
+			this.sendObjectToClient(new Message("Invalid number of arguments", pool.SERVER));
+			return;
+		}
+		var groupName = args[0];
+		if (pool.removeGroup(groupName)) {
+			this.sendObjectToClient(new Message("Group " + groupName + " removed", pool.SERVER));
+		} else {
+			this.sendObjectToClient(new Message("Group " + groupName + " does not exist", pool.SERVER));
+		}
+	}
+
+
+
 	@Override
 	public void run() {
 		try {
@@ -71,50 +198,15 @@ public class ChatServerHandler implements Runnable {
 					// Handle command
 					Command command = (Command) message;
 					switch (command.getCommand()) {
-						case "REGISTER":
-							// If the user is already registered, send a message to the client that they are
-							// already registered.
-							if (this.userName != null || actualPool.isUsernameTaken(command.getArgs()[0])) {
-								this.sendObjectToClient(new Command("REGISTER", null, "SERVER"));
-								break;
-							}
-
-							// Register the user
-							this.userName = command.getArgs()[0];
-
-							// Send a message to the client that they have been registered
-							this.sendObjectToClient(new Command("REGISTER", new String[] { this.userName }, "SERVER"));
-
-							System.out.printf("User %s registered\n", this.userName);
+						case REGISTER:
+							this.register(actualPool, command.getArgs());
 							break;
-						case "UNREGISTER":
-							// If the user is not registered, send a message to the client that they are not
-							// registered.
-							if (this.userName == null) {
-								this.sendObjectToClient(new Command("UNREGISTER", null, "SERVER"));
-								break;
-							}
-
-							// Send a message to the client that they have been unregistered
-							this.sendObjectToClient(
-									new Command("UNREGISTER", new String[] { this.userName }, "SERVER"));
-
-							// Unregister the user
-							this.userName = null;
-
-							System.out.println("User unregistered");
+						case UNREGISTER:
+							this.unregister(actualPool, command.getArgs());
 							break;
-						case "GETUSERS":
-							if (this.userName == null) {
-								this.sendObjectToClient(
-										new Message("You are not registered, use the REGISTER command.", "SERVER"));
-								break;
-							}
-							// Send a list of all registered users to the client
-							String[] users = actualPool.getUserList();
-							this.sendObjectToClient(new Command("GETUSERS", users, "SERVER"));
-							break;
-						case "SEND":
+						case GETUSERS:
+							this.getUsers(actualPool, command.getArgs());
+						CASE "SEND" // todo
 							if (this.userName == null) {
 								this.sendObjectToClient(
 										new Message("You are not registered, use the REGISTER command.", "SERVER"));
@@ -135,7 +227,9 @@ public class ChatServerHandler implements Runnable {
 
 							if (recipientType == -1) {
 								// Send a message to the specified user or group
-								this.sendObjectToClient(new Message("Recipient not found", "SERVER"));
+								this.sendObjectToClient(new Message("
+											Recipient not found", "SERVER"));
+
 							} else if (recipientType == 0) {
 								// Send the message to the specified user
 								Message msg = new DirectMessage(messageText, this.userName, recipient);
@@ -151,70 +245,15 @@ public class ChatServerHandler implements Runnable {
 								System.out.println("Unknown recipient type");
 							}
 							break;
-						case "CREATE":
-							if (this.userName == null) {
-								this.sendObjectToClient(
-										new Message("You are not registered, use the REGISTER command.", "SERVER"));
-								break;
-							}
-							// Create a new group
-							String groupName = command.getArgs()[0];
-							boolean createResult = actualPool.createGroup(groupName, this.userName);
-							if (createResult) {
-								this.sendObjectToClient(new Message("Group " + groupName + " created", "SERVER"));
-								System.out.printf("Group %s created by %s\n", groupName, this.userName);
-							} else {
-								this.sendObjectToClient(new Message("Group " + groupName + " already exists", "SERVER"));
-							}
+						case CREATE:
+							this.create(actualPool, command.getArgs());
 							break;
-						case "JOIN":
-							if (this.userName == null) {
-								this.sendObjectToClient(
-										new Message("You are not registered, use the REGISTER command.", "SERVER"));
-								break;
-							}
-							// Join an existing group
-							String groupToJoin = command.getArgs()[0];
-							boolean joinResult = actualPool.addUserToGroup(this.userName, groupToJoin);
-							if (joinResult) {
-								this.sendObjectToClient(new Message("You joined group " + groupToJoin, "SERVER"));
-								System.out.printf("User %s joined group %s\n", this.userName, groupToJoin);
-							} else {
-								this.sendObjectToClient(new Message("Group " + groupToJoin + " does not exist or you are already part of it", "SERVER"));
-							}
-							break;
-						case "LEAVE":
-							if (this.userName == null) {
-								this.sendObjectToClient(
-										new Message("You are not registered, use the REGISTER command.", "SERVER"));
-								break;
-							}
-							// Leave a group
-							String groupToLeave = command.getArgs()[0];
-							boolean leaveResult = actualPool.removeUserFromGroup(this.userName, groupToLeave);
-							if (leaveResult) {
-								this.sendObjectToClient(new Message("You left group " + groupToLeave, "SERVER"));
-								System.out.printf("User %s left group %s\n", this.userName, groupToLeave);
-							} else {
-								this.sendObjectToClient(new Message("Group " + groupToLeave + " does not exist or you are not part of it", "SERVER"));
-							}
-							break;
-						case "REMOVE":
-							if (this.userName == null) {
-								this.sendObjectToClient(
-										new Message("You are not registered, use the REGISTER command.", "SERVER"));
-								break;
-							}
-							// Remove a group
-							String groupToRemove = command.getArgs()[0];
-							boolean removeResult = actualPool.removeGroup(groupToRemove);
-							if (removeResult) {
-								this.sendObjectToClient(new Message("Group " + groupToRemove + " removed", "SERVER"));
-								System.out.printf("Group %s removed by %s\n", groupToRemove, this.userName);
-							} else {
-								this.sendObjectToClient(new Message("Group " + groupToRemove + " does not exist", "SERVER"));
-							}
-							break;
+						case JOIN:
+							this.join(actualPool, command.getArgs());
+						case LEAVE:
+							this.leave(actualPool, command.getArgs());
+						case REMOVE:
+							this.remove(actualPool, )
 						default:
 							break;
 					}
@@ -288,7 +327,7 @@ public class ChatServerHandler implements Runnable {
 	 *
 	 * @return the client name
 	 */
-	public String getClientName() {
-		return this.userName;
+	public User getClient() {
+		return this.user;
 	}
 }

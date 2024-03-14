@@ -2,11 +2,13 @@ package server;
 
 import shared.Group;
 import shared.Message;
+import shared.User;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ConnectionPool {
+	public final User SERVER = new User("Server");
     private final List<ChatServerHandler> connections = new ArrayList<>();
     private List<Group> groups = new ArrayList<>();
 
@@ -27,48 +29,48 @@ public class ConnectionPool {
      * Creates a group in the group list.
      *
      * @param groupName the group to be added
-     * @param owner     the owner of the group
+     * @param creator     the owner of the group
      * @return true if the group was created, false otherwise
      */
-    public boolean createGroup(String groupName, String owner) {
+    public boolean createGroup(String groupName, User creator) {
         if (isUsernameTaken(groupName)) {
             return false;
         }
-        Group group = new Group(groupName, owner);
+        Group group = new Group(groupName, creator);
         this.groups.add(group);
         return true;
     }
 
+
+	// todo is this method necessary?
     /**
      * Removes a group from the group list, only if it has less than 2 members.
      *
      * @param groupName the group to be removed
      * @return true if the group was removed, false otherwise
      */
-    public boolean removeGroup(String groupName) {
-        for (Group g : this.groups) {
-            if (g.getGroupName().equals(groupName)) {
-                if (g.getMembers().length < 2) {
-                    this.groups.remove(g);
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
+	public boolean removeGroup(String groupName) {
+		return this.groups.removeIf(g -> g.getGroupName().equals(groupName) && g.getMembers().size() < 2);
+	}
 
+	public Group getGroup(String groupName) {
+		for (Group group : this.groups) {
+			if (group.getGroupName().equals(groupName)) {
+				return group;
+			}
+		}
+		return null;
+	}
+
+	// todo is this method necessary?
     /**
-     * Removes a group from the group list, only if it has no members.
+     * Removes a group from the group list, should only be used if the group has no members, does not notify users.
      *
      * @param group the group to be removed
      * @return true if the group was removed, false otherwise
      */
-    public boolean removeGroup(Group group) {
-        if (group.getMembers().length < 1) {
-            this.groups.remove(group);
-            return true;
-        }
-        return false;
+	public boolean removeGroup(Group group) {
+		return this.groups.remove(group);
     }
 
     /**
@@ -78,17 +80,16 @@ public class ConnectionPool {
      * @param group the group to add the user to
      * @return true if the user was added, false otherwise
      */
-    public boolean addUserToGroup(String user, String group) {
-        for (Group g : this.groups) {
-            if (g.getGroupName().equals(group)) {
-                if (g.isMember(user)) {
-                    return false;
-                }
-                g.addMember(user);
-                return true;
-            }
-        }
-        return false;
+	public boolean addUserToGroup(User user, String groupName) {
+		var group = this.getGroup(groupName);
+		if (group == null) {
+			return false;
+		}
+		if (group.hasMember(user)) {
+			return false;
+		}
+		group.addMember(user);
+		return true;
     }
 
     /**
@@ -98,21 +99,16 @@ public class ConnectionPool {
      * @param group the group to remove the user from
      * @return true if the user was removed, false otherwise
      */
-    public boolean removeUserFromGroup(String user, String group) {
-        for (Group g : this.groups) {
-            if (g.getGroupName().equals(group)) {
-                if (!g.isMember(user)) {
-                    return false;
-                }
-                g.removeMember(user);
-                if (g.getMembers().length < 1) {
-                    removeGroup(g);
-                    System.out.println("Group " + group + " removed");
-                }
-                return true;
-            }
-        }
-        return false;
+	public boolean removeUserFromGroup(User user, String groupName) {
+		var group = this.getGroup(groupName);
+		if (group == null) {
+			return false;
+		}
+		if (!group.hasMember(user)) {
+			return false;
+		}
+		group.removeMember(user);
+		return true;
     }
 
     /**
@@ -141,8 +137,9 @@ public class ConnectionPool {
      *
      * @param message
      */
-    public void sendToUser(Message message, String recipient) {
-        for (ChatServerHandler handler : this.connections) {
+    public void sendToUser(Message message, User recipient) {
+		for (ChatServerHandler handler : this.connections) {
+			if (hansl)
             if (handler.getClientName() != null && handler.getClientName().equals(recipient)) {
                 handler.sendObjectToClient(message);
             }

@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 public class Message implements Serializable {
 	private String messageBody;
-	private String user;
+	private User user;
 
 	/**
 	 * Represents a message with a message body and the user who sent it.
@@ -13,7 +13,7 @@ public class Message implements Serializable {
 	 * @param messageBody the body of the message
 	 * @param user        the user who sent the message
 	 */
-	public Message(String messageBody, String user) {
+	public Message(String messageBody, User user) {
 		this.messageBody = messageBody;
 		this.user = user;
 	}
@@ -32,7 +32,7 @@ public class Message implements Serializable {
 	 *
 	 * @return the user associated with this message
 	 */
-	public String getUser() {
+	public User getUser() {
 		return this.user;
 	}
 

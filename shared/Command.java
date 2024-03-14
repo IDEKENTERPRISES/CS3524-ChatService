@@ -3,20 +3,9 @@ package shared;
 import java.io.Serializable;
 
 public class Command implements Serializable {
-    public static final String[] keywords = new String[] {
-		"REGISTER",
-		"UNREGISTER",
-		"GETUSERS",
-		"SEND",
-		"CREATE",
-		"JOIN",
-		"LEAVE",
-		"REMOVE"
-	};
-
-    private final String command;
+    private final CommandType type;
     private final String[] args;
-    private final String username;
+    private final User user;
 
     /**
      * Constructs a new Command object with the specified command, arguments, and
@@ -26,10 +15,10 @@ public class Command implements Serializable {
      * @param args     the arguments for the command
      * @param username the username of the user executing the command
      */
-    public Command(String command, String[] args, String username) {
-        this.command = command;
+    public Command(CommandType type, String[] args, User user) {
+        this.type = type;
         this.args = args;
-        this.username = username;
+		this.user = user;
     }
 
     /**
@@ -37,8 +26,8 @@ public class Command implements Serializable {
      *
      * @return the command as a string
      */
-    public String getCommand() {
-        return this.command;
+    public CommandType getCommand() {
+        return this.type;
     }
 
     /**
@@ -55,8 +44,8 @@ public class Command implements Serializable {
      *
      * @return the username as a String
      */
-    public String getUsername() {
-        return this.username;
+    public User getUser() {
+        return this.user;
     }
 
     /**
@@ -66,7 +55,7 @@ public class Command implements Serializable {
      */
     @Override
     public String toString() {
-        String argString = "";
+		String argString = "";
 
         if (this.args != null) {
             for (String arg : this.args) {
@@ -74,6 +63,6 @@ public class Command implements Serializable {
             }
         }
 
-        return String.format("Command: %s, Args: %s, Username: %s", this.command, argString, this.username);
+        return String.format("Command: %s, Args: %s, Username: %s", this.type.name(), argString, this.user);
     }
 }

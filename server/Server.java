@@ -44,7 +44,7 @@ public class Server {
 			System.out.println("Client connected.");
 
 			// Creates a new handler for the client and adds it to the connection pool before returning it.
-			ChatServerHandler handler = new ChatServerHandler(socket, this.pool); 
+			ChatServerHandler handler = new ChatServerHandler(socket, this.pool);
 			this.pool.addConnection(handler);
 			return handler;
 		} catch (IOException e) {

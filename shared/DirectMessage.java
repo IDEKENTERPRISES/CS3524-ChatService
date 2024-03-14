@@ -1,7 +1,7 @@
 package shared;
 
 public class DirectMessage extends Message{
-    private String recipient;
+    private User recipient;
 
     /**
      * Constructs a new DirectMessage object with the specified message body, user, and recipient.
@@ -10,7 +10,7 @@ public class DirectMessage extends Message{
      * @param user        the user who sent the message
      * @param recipient   the recipient of the message
      */
-    public DirectMessage(String messageBody, String user, String recipient) {
+    public DirectMessage(String messageBody, User user, User recipient) {
         super(messageBody, user);
         this.recipient = recipient;
     }
@@ -20,7 +20,7 @@ public class DirectMessage extends Message{
      *
      * @return the recipient as a String
      */
-    public String getRecipient() {
+    public User getRecipient() {
         return this.recipient;
     }
 

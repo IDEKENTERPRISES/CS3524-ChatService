@@ -10,7 +10,7 @@ public class GroupMessage extends Message{
      * @param user        the user who sent the message
      * @param groupName   the group to which the message was sent
      */
-    public GroupMessage(String messageBody, String user, String groupName) {
+    public GroupMessage(String messageBody, User user, String groupName) {
         super(messageBody, user);
         this.groupName = groupName;
     }
