@@ -18,7 +18,7 @@ public class Group {
 
     /**
      * Adds a member to the group.
-     * 
+     *
      * @param member the member to be added
      */
     public void addMember(String member) {
@@ -32,7 +32,7 @@ public class Group {
 
     /**
      * Removes a member from the group.
-     * 
+     *
      * @param member the member to be removed
      */
     public void removeMember(String member) {
@@ -49,7 +49,7 @@ public class Group {
 
     /**
      * Checks if a user is a member of the group.
-     * 
+     *
      * @param user the user to check
      */
     public boolean isMember(String user) {

@@ -124,13 +124,13 @@ public class ChatServerHandler implements Runnable {
 							String recipient = command.getArgs()[0];
 							int recipientType = checkRecipients(recipient);
 
-							
+
 							String messageText = "";
 							for (int i = 1; i < command.getArgs().length; i++) {
 								messageText += command.getArgs()[i] + " ";
 							}
 							messageText = messageText.trim();
-							
+
 							System.out.println(this.userName + " SENT message to " + recipient + ": " + messageText);
 
 							if (recipientType == -1) {
@@ -254,7 +254,7 @@ public class ChatServerHandler implements Runnable {
 	 * Recipients are specified in the first word of the message, either a group
 	 * name or a user name.
 	 * Uses StringTokenizer
-	 * 
+	 *
 	 * @param message
 	 * @return 0 if the recipient is a user, 1 if the recipient is a group, -1 if
 	 *         the recipient is not found

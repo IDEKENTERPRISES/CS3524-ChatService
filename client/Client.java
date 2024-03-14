@@ -72,7 +72,7 @@ public class Client {
 
     /**
      * Retrieves the user input message as a String.
-     * 
+     *
      * @return the user input message as a String, or null if no input is received
      *         or if the user enters "exit"
      */
@@ -96,7 +96,7 @@ public class Client {
     /**
      * Sends a user message to the server, sends as either a Message or a Command
      * based on first token.
-     * 
+     *
      * @param messageString the message string to be sent
      */
     private void sendUserMessage(String messageString) {

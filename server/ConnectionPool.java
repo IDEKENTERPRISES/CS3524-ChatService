@@ -73,7 +73,7 @@ public class ConnectionPool {
 
     /**
      * Adds a user to a group.
-     *  
+     *
      * @param user the user to be added
      * @param group the group to add the user to
      * @return true if the user was added, false otherwise
@@ -93,7 +93,7 @@ public class ConnectionPool {
 
     /**
      * Removes a user from a group.
-     * 
+     *
      * @param user  the user to be removed
      * @param group the group to remove the user from
      * @return true if the user was removed, false otherwise
@@ -138,7 +138,7 @@ public class ConnectionPool {
 
     /**
      * Sends a message to a specified user
-     * 
+     *
      * @param message
      */
     public void sendToUser(Message message, String recipient) {
@@ -151,7 +151,7 @@ public class ConnectionPool {
 
     /**
      * Sends a message to a specified group
-     * 
+     *
      * @param message
      * @param recipient
      * @return true if the message was sent, false otherwise

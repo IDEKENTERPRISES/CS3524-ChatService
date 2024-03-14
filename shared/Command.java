@@ -4,14 +4,15 @@ import java.io.Serializable;
 
 public class Command implements Serializable {
     public static final String[] keywords = new String[] {
-            "REGISTER",
-            "UNREGISTER",
-            "GETUSERS",
-            "SEND",
-            "CREATE",
-            "JOIN",
-            "LEAVE",
-            "REMOVE"};
+		"REGISTER",
+		"UNREGISTER",
+		"GETUSERS",
+		"SEND",
+		"CREATE",
+		"JOIN",
+		"LEAVE",
+		"REMOVE"
+	};
 
     private final String command;
     private final String[] args;

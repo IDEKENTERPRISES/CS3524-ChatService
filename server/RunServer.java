@@ -11,7 +11,7 @@ public class RunServer {
 
 		// Ask server admin port number on which the server will listen for incoming connections.
 		int port = 42096;
-		
+
 		Scanner scanner = new Scanner(System.in);
 		try {
 
