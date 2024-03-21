@@ -3,7 +3,9 @@ package shared;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Group {
+import server.ConnectionPool;
+
+public class Group implements Recipient{
 	private String groupName;
 	private List<User> members;
 
@@ -77,4 +79,14 @@ public class Group {
 		}
 		return memberString;
     }
+
+	@Override
+	public void sendMessage(ConnectionPool pool, Message message) {
+		var groupMessage = new GroupMessage(this, message);
+		for (User user : members) {
+			user.sendMessage(pool, groupMessage);
+		}
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'sendMessage'");
+	}
 }

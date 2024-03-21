@@ -3,7 +3,9 @@ package shared;
 import java.io.Serializable;
 import java.util.UUID;
 
-public class User implements Serializable{
+import server.ConnectionPool;
+
+public class User implements Serializable, Recipient{
 	private String username;
 	private UUID id;
 
@@ -42,5 +44,10 @@ public class User implements Serializable{
 	@Override
 	public String toString() {
 		return this.username;
+	}
+
+	@Override
+	public void sendMessage(ConnectionPool pool, Message message) {
+		pool.connections.get(this).sendObjectToClient(message);
 	}
 }

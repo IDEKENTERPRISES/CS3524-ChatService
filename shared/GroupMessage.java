@@ -15,6 +15,11 @@ public class GroupMessage extends Message{
         this.groupName = groupName;
     }
 
+	public GroupMessage(Group group, Message message) {
+		super(message.getMessageBody(), message.getUser());
+		this.groupName = group.getGroupName();
+	}
+
     /**
      * Returns the group name associated with this message.
      *

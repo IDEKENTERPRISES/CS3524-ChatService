@@ -1,7 +1,9 @@
 package client;
 
 import shared.Message;
+import shared.User;
 import shared.Command;
+import shared.CommandType;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -16,8 +18,8 @@ import java.util.StringTokenizer;
 public class Client {
 
     private final String host;
-    private final int port;
-    private String username;
+	private final int port;
+	private User user;
     private Socket socket;
     private Scanner scanner;
     private ObjectInputStream inputStream;
@@ -32,7 +34,6 @@ public class Client {
     public Client(String host, int port) {
         this.host = host;
         this.port = port;
-        this.username = null;
         this.socket = null;
         this.scanner = null;
         this.inputStream = null;
@@ -76,22 +77,31 @@ public class Client {
      * @return the user input message as a String, or null if no input is received
      *         or if the user enters "exit"
      */
-    private String getUserMessage() {
-        String messageBody = null; // Instantiate the return value
-        System.out.print("Please input >");
-        try {
-            messageBody = this.scanner.nextLine();
-            if (messageBody.equalsIgnoreCase("exit")) {
-                this.exitFlag = true;
-            }
-        } catch (NoSuchElementException e) {
-            // This might be thrown by `this.scanner.nextLine()` if the client
-            // exits with CTRL-C. In such case exit and return null.
-            System.err.println("No input received. Exiting...");
-            this.exitFlag = true;
-        }
-        return messageBody;
-    }
+	private String getUserMessage() {
+		String messageBody = null; // Instantiate the return value
+		System.out.print("Please input >");
+		try {
+			messageBody = this.scanner.nextLine();
+			if (messageBody.equalsIgnoreCase("exit")) {
+				this.exitFlag = true;
+			}
+		} catch (NoSuchElementException e) {
+			// This might be thrown by `this.scanner.nextLine()` if the client
+			// exits with CTRL-C. In such case exit and return null.
+			System.err.println("No input received. Exiting...");
+			this.exitFlag = true;
+		}
+		return messageBody;
+	}
+
+	// I hate this
+	public static CommandType getCommandType(String commandString) {
+		try {
+			return CommandType.valueOf(commandString);
+		} catch (IllegalArgumentException e) {
+			return null;
+		}
+	}
 
     /**
      * Sends a user message to the server, sends as either a Message or a Command
@@ -108,20 +118,18 @@ public class Client {
             }
 
             String firstToken = tokenizer.nextToken(); // Get the first token/word
-
-            if (Arrays.asList(Command.keywords).contains(firstToken)) {
-                // If the first token is a command keyword, send a Command with the remaining
-                // tokens as args
-                String[] args = new String[tokenizer.countTokens()];
-                for (int i = 0; i < args.length; i++) {
+			var commandType = getCommandType(firstToken);
+			if (commandType != null) {
+				String[] args = new String[tokenizer.countTokens()];
+				for (int i = 0; i < args.length; i++) {
                     args[i] = tokenizer.nextToken();
                 }
-                Command userCommand = new Command(firstToken, args, this.username);
+				Command userCommand = new Command(commandType, args, this.user);
                 this.outputStream.writeObject(userCommand);
             } else {
                 // If the first token is not a command keyword, send a Message with the entire
                 // message as the body
-                Message userMessage = new Message(messageString, this.username);
+                Message userMessage = new Message(messageString, this.user);
                 this.outputStream.writeObject(userMessage);
             }
         } catch (IOException e) {

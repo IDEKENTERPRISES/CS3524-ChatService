@@ -5,6 +5,7 @@ import shared.CommandType;
 import shared.DirectMessage;
 import shared.GroupMessage;
 import shared.Message;
+import shared.Recipient;
 import shared.User;
 
 import java.io.IOException;
@@ -105,11 +106,30 @@ public class ChatServerHandler implements Runnable {
 
 	}
 
+	public void send(ConnectionPool pool, String messageBody, Recipient recipient) {
+		if (recipient == null) {
+			this.sendObjectToClient(new Message("Unknown recipient for message", pool.SERVER));
+			return;
+		}
+
+		recipient.sendMessage(pool, new Message(messageBody, user));
+	}
+
 	public void send(ConnectionPool pool, String[] args) {
 		if (!this.verifyRegistered(pool)) {
 			return;
 		}
-		// todo (complicated)
+
+		if (args.length != 2) {
+			this.sendObjectToClient(new Message("Invalid number of arguments", pool.SERVER));
+			return;
+		}
+
+		var recipientName = args[0];
+
+		var recipient = pool.getRecipient(recipientName);
+		var messageText = args[1];
+		this.send(pool, messageText, recipient);
 	}
 
 	public void create(ConnectionPool pool, String[] args) {
@@ -178,8 +198,6 @@ public class ChatServerHandler implements Runnable {
 		}
 	}
 
-
-
 	@Override
 	public void run() {
 		try {
@@ -206,44 +224,9 @@ public class ChatServerHandler implements Runnable {
 							break;
 						case GETUSERS:
 							this.getUsers(actualPool, command.getArgs());
-						CASE "SEND" // todo
-							if (this.userName == null) {
-								this.sendObjectToClient(
-										new Message("You are not registered, use the REGISTER command.", "SERVER"));
-								break;
-							}
-							// Send a message to the specified user or group
-							String recipient = command.getArgs()[0];
-							int recipientType = checkRecipients(recipient);
-
-
-							String messageText = "";
-							for (int i = 1; i < command.getArgs().length; i++) {
-								messageText += command.getArgs()[i] + " ";
-							}
-							messageText = messageText.trim();
-
-							System.out.println(this.userName + " SENT message to " + recipient + ": " + messageText);
-
-							if (recipientType == -1) {
-								// Send a message to the specified user or group
-								this.sendObjectToClient(new Message("
-											Recipient not found", "SERVER"));
-
-							} else if (recipientType == 0) {
-								// Send the message to the specified user
-								Message msg = new DirectMessage(messageText, this.userName, recipient);
-								actualPool.sendToUser(msg, recipient);
-							} else if (recipientType == 1) {
-								// Send the message to the specified group
-								GroupMessage msg = new GroupMessage(messageText, this.userName, recipient);
-								boolean groupResult = actualPool.sendToGroup(msg, recipient);
-								if (!groupResult) {
-									this.sendObjectToClient(new Message("Group " + recipient + " does not exist or you are not part of it", "SERVER"));
-								}
-							} else {
-								System.out.println("Unknown recipient type");
-							}
+							break;
+						case SEND:
+							this.send(actualPool, command.getArgs());
 							break;
 						case CREATE:
 							this.create(actualPool, command.getArgs());
@@ -253,21 +236,17 @@ public class ChatServerHandler implements Runnable {
 						case LEAVE:
 							this.leave(actualPool, command.getArgs());
 						case REMOVE:
-							this.remove(actualPool, )
+							this.remove(actualPool, command.getArgs());
 						default:
 							break;
 					}
 				} else if (message instanceof Message) {
 					// Handle message
 					Message msg = (Message) message;
-					if (this.getClientName() == null) {
-						this.sendObjectToClient(
-								new Message("You are not registered, use the REGISTER command.", "SERVER"));
-					} else {
-						// Broadcast the message to all connected and registered clients
-						System.out.println(msg.toString());
-						actualPool.broadcast(msg);
+					if (!this.verifyRegistered(actualPool)) {
+						return;
 					}
+					actualPool.sendMessage(actualPool, msg);
 				} else {
 					System.out.println("Unknown message type received");
 				}
@@ -286,27 +265,6 @@ public class ChatServerHandler implements Runnable {
 				}
 			}
 		}
-	}
-
-	/**
-	 * Checks if the recipients of a message are registered users or groups.
-	 * Recipients are specified in the first word of the message, either a group
-	 * name or a user name.
-	 * Uses StringTokenizer
-	 *
-	 * @param message
-	 * @return 0 if the recipient is a user, 1 if the recipient is a group, -1 if
-	 *         the recipient is not found
-	 */
-	public int checkRecipients(String recipient) {
-		ConnectionPool actualPool = pool.get();
-		if (actualPool == null) {
-			System.out.println("Connection pool is null");
-			return -1;
-		}
-
-		int recipientType = actualPool.checkRecipient(recipient);
-		return recipientType;
 	}
 
 	/**
