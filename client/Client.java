@@ -1,29 +1,28 @@
 package client;
 
-import shared.Message;
-import shared.Command;
+import shared.User;
+import shared.requests.*;
+import shared.responses.Response;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.Arrays;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
-import java.util.StringTokenizer;
 
 public class Client {
 
     private final String host;
     private final int port;
-    private String username;
+    private User user;
     private Socket socket;
     private Scanner scanner;
     private ObjectInputStream inputStream;
     private ObjectOutputStream outputStream;
     private Thread listenerThread;
-    private Boolean exitFlag;
+    private boolean exitFlag;
 
     /**
      * Represents a client that connects to a server using a specified host and
@@ -32,41 +31,28 @@ public class Client {
     public Client(String host, int port) {
         this.host = host;
         this.port = port;
-        this.username = null;
         this.socket = null;
         this.scanner = null;
         this.inputStream = null;
         this.outputStream = null;
         this.listenerThread = null;
-        this.exitFlag = null;
+        this.exitFlag = false;
     }
 
-    /**
-     * Sets up the client by establishing a connection with the server and
-     * initializing input/output streams.
-     */
-    private void setup() {
-        System.out.println("Setup started.");
+    private Request getRequestFromString(String commandString) {
+        return RequestFactory.createRequest(commandString);
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    private void sendRequest(Request request) {
         try {
-            this.socket = new Socket(this.host, this.port);
-            System.out.println("Connected to server.");
-
-            this.scanner = new Scanner(System.in);
-            this.outputStream = new ObjectOutputStream(
-                    this.socket.getOutputStream() // Generate an output stream from the socket
-            );
-            this.inputStream = new ObjectInputStream(
-                    this.socket.getInputStream() // Generate an input stream from the socket
-            );
-
-            this.exitFlag = false;
-            System.out.println("Setup complete!");
-        } catch (UnknownHostException e) {
-            System.err.println("Unknown host `" + this.host + "`.");
-            this.exitFlag = true;
+            this.outputStream.writeObject(request);
         } catch (IOException e) {
-            System.err.println("Could not connect to the server.");
-            this.exitFlag = true; // Close the program here
+            System.err.println("Failed while communicating with the server.");
+            this.exitFlag = true;
         }
     }
 
@@ -94,55 +80,33 @@ public class Client {
     }
 
     /**
-     * Sends a user message to the server, sends as either a Message or a Command
-     * based on first token.
-     *
-     * @param messageString the message string to be sent
+     * Sets up the client by establishing a connection with the server and
+     * initializing input/output streams.
      */
-    private void sendUserMessage(String messageString) {
+    private void setup() {
+        System.out.println("Setup started.");
         try {
-            StringTokenizer tokenizer = new StringTokenizer(messageString); // Tokenize the message
+            this.socket = new Socket(this.host, this.port);
+            System.out.println("Connected to server.");
 
-            if (!tokenizer.hasMoreTokens()) {
-                return; // If there are no tokens, return
-            }
+            this.scanner = new Scanner(System.in);
+            this.outputStream = new ObjectOutputStream(
+                    this.socket.getOutputStream() // Generate an output stream from the socket
+            );
+            this.inputStream = new ObjectInputStream(
+                    this.socket.getInputStream() // Generate an input stream from the socket
+            );
 
-            String firstToken = tokenizer.nextToken(); // Get the first token/word
-
-            if (Arrays.asList(Command.keywords).contains(firstToken)) {
-                // If the first token is a command keyword, send a Command with the remaining
-                // tokens as args
-                String[] args = new String[tokenizer.countTokens()];
-                for (int i = 0; i < args.length; i++) {
-                    args[i] = tokenizer.nextToken();
-                }
-                Command userCommand = new Command(firstToken, args, this.username);
-                this.outputStream.writeObject(userCommand);
-            } else {
-                // If the first token is not a command keyword, send a Message with the entire
-                // message as the body
-                Message userMessage = new Message(messageString, this.username);
-                this.outputStream.writeObject(userMessage);
-            }
-        } catch (IOException e) {
-            System.err.println("Failed communicating with the server.");
+            System.out.println("Setup complete!");
+        } catch (UnknownHostException e) {
+            System.err.println("Unknown host `" + this.host + "`.");
             this.exitFlag = true;
+        } catch (IOException e) {
+            System.err.println("Could not connect to the server.");
+            this.exitFlag = true; // Close the program here
         }
     }
 
-    /**
-     * Handles user input by continuously prompting for messages and sending them to
-     * the server.
-     * This method runs in a loop until the exit flag is set to true.
-     */
-    private void handleUserInput() {
-        while (!this.exitFlag) {
-            String messageString = this.getUserMessage();
-            if (messageString != null) {
-                this.sendUserMessage(messageString);
-            }
-        }
-    }
 
     /**
      * Starts a listener thread that listens to the server.
@@ -156,6 +120,25 @@ public class Client {
     }
 
     /**
+     * Handles user input by continuously prompting for messages and sending them to
+     * the server.
+     * This method runs in a loop until the exit flag is set to true.
+     */
+    private void handleUserInput() {
+        while (!this.exitFlag) {
+            String messageString = this.getUserMessage();
+            if (!this.exitFlag && messageString != null) {
+                var request = this.getRequestFromString(messageString);
+                if (request == null) {
+                    System.err.println("Something went wrong when parsing '" + messageString + "'");
+                } else {
+                    this.sendRequest(request);
+                }
+            }
+        }
+    }
+
+    /**
      * Starts the client by starting the listener thread and handling user input.
      */
     private void start() {
@@ -163,71 +146,14 @@ public class Client {
         this.handleUserInput();
     }
 
-    /**
-     * Receives a message or command from the server and prints it to the console.
-     * If the received object is a Message, it is printed as a string.
-     * If the received object is a Command, it is processed accordingly.
-     *
-     * @throws IOException if an I/O error occurs while reading from the input
-     *                     stream.
-     */
-    private void receiveObjectAndProcess() throws IOException {
+    private void receiveResponse() throws IOException {
         try {
-
-            Object inObject = this.inputStream.readObject();
-
-            if (inObject instanceof Message) {
-                // If the received object is a Message, print it to the console
-
-                Message inMessage = (Message) inObject;
-                System.out.println(inMessage.toString()); // TODO: Fix printing formatting, need to clear line before
-                                                          // printing message.
-                System.out.print("Please input >");
-            } else if (inObject instanceof Command) {
-                // If the received object is a Command
-
-                Command command = (Command) inObject;
-                switch (command.getCommand()) {
-                    case "REGISTER":
-                        // If the command is a REGISTER command, set the username if args are present
-                        if (command.getArgs() != null && command.getArgs().length > 0) {
-                            this.username = command.getArgs()[0];
-                            System.out.println("Registered as " + this.username);
-                        } else {
-                            System.out.println("Failed to register.");
-                        }
-                        break;
-                    case "UNREGISTER":
-                        // If the command is an UNREGISTER command, unset the username if args are
-                        // present
-                        if (command.getArgs() != null && command.getArgs().length > 0) {
-                            this.username = null;
-                            System.out.println("Unregistered.");
-                        } else {
-                            System.out.println("Failed to unregister.");
-                        }
-                        break;
-                    case "GETUSERS":
-                        // If the command is a GETUSERS command, print the users if args are present
-                        if (command.getArgs() != null || command.getArgs().length > 0) {
-                            System.out.println("Users: " + String.join(", ", command.getArgs()));
-                        } else {
-                            System.out.println("Failed to get users.");
-                        }
-                        break;
-                    default:
-                        break;
-                }
+            Object in = this.inputStream.readObject();
+            if (in instanceof Response) {
+                ((Response)in).execute(this);
+            } else {
+                System.err.println("Unknown message type received");
             }
-        } catch (NullPointerException e) {
-            /*
-             * this.streamFromServer was not initialised. Either:
-             * (a) something went wrong during setup, or
-             * (b) this.close() was called.
-             * In both cases we expect this.exitFlag = true.
-             */
-            System.err.println("Failed to read from server.");
-            this.exitFlag = true;
         } catch (ClassNotFoundException e) {
             System.err.println("Could not deserialise the message.");
         }
@@ -240,10 +166,10 @@ public class Client {
      * message and continues listening.
      */
     private void listenToServer() {
-        while (true) {
+        while (!this.exitFlag) {
             try {
                 // Receive an object from the server and print it
-                this.receiveObjectAndProcess();
+                this.receiveResponse();
             } catch (IOException e) {
                 // Close the listener if the program has exited
                 if (this.exitFlag)

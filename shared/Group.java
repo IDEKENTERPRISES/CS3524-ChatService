@@ -1,8 +1,11 @@
 package shared;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class Group {
     private String groupName;
-    private String[] members;
+    private Set<User> members;
 
     /**
      * Constructs a new Group object with the specified group name and members.
@@ -10,41 +13,27 @@ public class Group {
      * @param groupName the name of the group
      * @param owner   the owner of the group
      */
-    public Group(String groupName, String owner) {
+    public Group(String groupName) {
         this.groupName = groupName;
-        this.members = new String[1];
-        this.members[0] = owner;
+        this.members = new HashSet<User>();
     }
 
     /**
      * Adds a member to the group.
      *
-     * @param member the member to be added
+     * @param user the member to be added
      */
-    public void addMember(String member) {
-        String[] newMembers = new String[this.members.length + 1];
-        for (int i = 0; i < this.members.length; i++) {
-            newMembers[i] = this.members[i];
-        }
-        newMembers[this.members.length] = member;
-        this.members = newMembers;
+    public void addMember(User user) {
+        this.members.add(user);
     }
 
     /**
      * Removes a member from the group.
      *
-     * @param member the member to be removed
+     * @param user the member to be removed
      */
-    public void removeMember(String member) {
-        String[] newMembers = new String[this.members.length - 1];
-        int j = 0;
-        for (int i = 0; i < this.members.length; i++) {
-            if (!this.members[i].equals(member)) {
-                newMembers[j] = this.members[i];
-                j++;
-            }
-        }
-        this.members = newMembers;
+    public void removeMember(User user) {
+        this.members.removeIf(m -> m.equals(user));
     }
 
     /**
@@ -52,13 +41,8 @@ public class Group {
      *
      * @param user the user to check
      */
-    public boolean isMember(String user) {
-        for (String member : this.members) {
-            if (member.equals(user)) {
-                return true;
-            }
-        }
-        return false;
+    public boolean hasMember(User user) {
+        return this.members.contains(user);
     }
 
     /**
@@ -75,7 +59,7 @@ public class Group {
      *
      * @return an array of strings representing the members of the group
      */
-    public String[] getMembers() {
+    public Set<User> getMembers() {
         return this.members;
     }
 
@@ -87,12 +71,9 @@ public class Group {
     @Override
     public String toString() {
         String memberString = "";
-        for (int i = 0; i < this.members.length; i++) {
-            memberString += this.members[i];
-            if (i < this.members.length - 1) {
-                memberString += ", ";
-            }
+        for (User user : members) {
+            memberString += user + ", ";
         }
-        return this.groupName + ": " + memberString + ".";
+        return memberString;
     }
 }

@@ -1,18 +1,16 @@
 package server;
 
 import shared.Group;
-import shared.Message;
+import shared.User;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class ConnectionPool {
-    private final List<ChatServerHandler> connections = new ArrayList<>();
-    private List<Group> groups = new ArrayList<>();
-
-    public static int NOTFOUND = -1;
-    public static int USER = 0;
-    public static int GROUP = 1;
+    public final User SERVER = new User("Server");
+    private Set<ChatServerHandler> handlers = new HashSet<>();
+    private Set<Group> groups = new HashSet<>();
 
     /**
      * Adds a connection to the connection pool.
@@ -20,23 +18,25 @@ public class ConnectionPool {
      * @param handler the ChatServerHandler representing the connection to be added
      */
     public void addConnection(ChatServerHandler handler) {
-        connections.add(handler);
+        handlers.add(handler);
+    }
+
+    public Set<User> getUsers() {
+        return handlers.stream()
+            .map(h -> h.getUser())
+            .filter(u -> u != null)
+            .collect(Collectors.toSet());
     }
 
     /**
      * Creates a group in the group list.
      *
      * @param groupName the group to be added
-     * @param owner     the owner of the group
-     * @return true if the group was created, false otherwise
+     * @param creator     the owner of the group
+     *
      */
-    public boolean createGroup(String groupName, String owner) {
-        if (isUsernameTaken(groupName)) {
-            return false;
-        }
-        Group group = new Group(groupName, owner);
-        this.groups.add(group);
-        return true;
+    public void createGroup(String groupName) {
+        this.groups.add(new Group(groupName));
     }
 
     /**
@@ -46,148 +46,43 @@ public class ConnectionPool {
      * @return true if the group was removed, false otherwise
      */
     public boolean removeGroup(String groupName) {
-        for (Group g : this.groups) {
-            if (g.getGroupName().equals(groupName)) {
-                if (g.getMembers().length < 2) {
-                    this.groups.remove(g);
-                    return true;
-                }
-            }
-        }
-        return false;
+        return this.groups.removeIf(g -> g.getGroupName().equals(groupName) && g.getMembers().size() < 2);
     }
 
+    public Group getGroup(String groupName) {
+        for (Group group : groups) {
+            System.out.println(groupName + " " + group.getGroupName() + " : " + group.getGroupName().equals(groupName));
+        }
+        return groups.stream()
+            .filter(g -> g.getGroupName().equals(groupName))
+            .findFirst()
+            .orElse(null);
+    }
+
+    public User getUser(String username) {
+        return handlers.stream()
+            .map(h -> h.getUser())
+            .filter(u -> u != null && u.getUserName().equals(username))
+            .findFirst()
+            .orElse(null);
+    }
+
+    public ChatServerHandler getHandler(User user) {
+        return handlers.stream()
+            .filter(h -> user.equals(h.getUser()))
+            .findFirst()
+            .orElse(null);
+    }
+
+    // todo is this method necessary?
     /**
-     * Removes a group from the group list, only if it has no members.
+     * Removes a group from the group list, should only be used if the group has no members, does not notify users.
      *
      * @param group the group to be removed
      * @return true if the group was removed, false otherwise
      */
     public boolean removeGroup(Group group) {
-        if (group.getMembers().length < 1) {
-            this.groups.remove(group);
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Adds a user to a group.
-     *
-     * @param user the user to be added
-     * @param group the group to add the user to
-     * @return true if the user was added, false otherwise
-     */
-    public boolean addUserToGroup(String user, String group) {
-        for (Group g : this.groups) {
-            if (g.getGroupName().equals(group)) {
-                if (g.isMember(user)) {
-                    return false;
-                }
-                g.addMember(user);
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Removes a user from a group.
-     *
-     * @param user  the user to be removed
-     * @param group the group to remove the user from
-     * @return true if the user was removed, false otherwise
-     */
-    public boolean removeUserFromGroup(String user, String group) {
-        for (Group g : this.groups) {
-            if (g.getGroupName().equals(group)) {
-                if (!g.isMember(user)) {
-                    return false;
-                }
-                g.removeMember(user);
-                if (g.getMembers().length < 1) {
-                    removeGroup(g);
-                    System.out.println("Group " + group + " removed");
-                }
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Checks if string is a group name or a username.
-     *
-     * @param name the string to check
-     * @return 0 if the string is a username, 1 if the string is a group name, -1 if
-     *         not found
-     */
-    public int checkRecipient(String name) {
-        for (Group group : this.groups) {
-            if (group.getGroupName().equals(name)) {
-                return GROUP;
-            }
-        }
-        for (ChatServerHandler handler : this.connections) {
-            if (handler.getClientName() != null && handler.getClientName().equals(name)) {
-                return USER;
-            }
-        }
-        return NOTFOUND;
-    }
-
-    /**
-     * Sends a message to a specified user
-     *
-     * @param message
-     */
-    public void sendToUser(Message message, String recipient) {
-        for (ChatServerHandler handler : this.connections) {
-            if (handler.getClientName() != null && handler.getClientName().equals(recipient)) {
-                handler.sendObjectToClient(message);
-            }
-        }
-    }
-
-    /**
-     * Sends a message to a specified group
-     *
-     * @param message
-     * @param recipient
-     * @return true if the message was sent, false otherwise
-     */
-    public boolean sendToGroup(Message message, String recipient) {
-        for (Group group : this.groups) {
-            if (group.getGroupName().equals(recipient)) {
-                if (!group.isMember(message.getUser())) {
-                    return false;
-                }
-                for (String member : group.getMembers()) {
-                    for (ChatServerHandler handler : this.connections) {
-                        if (handler.getClientName() != null && handler.getClientName().equals(member)) {
-                            handler.sendObjectToClient(message);
-                        }
-                    }
-                }
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Broadcasts a message to all connected clients except the sender.
-     *
-     * @param message the message to be broadcasted
-     */
-    public void broadcast(Message message) {
-        for (ChatServerHandler handler : this.connections) {
-            String clientName = handler.getClientName();
-            if (clientName != null && !clientName.equals(message.getUser())) {
-                // System.out.println("Relaying to " + handler.getClientName());
-                handler.sendObjectToClient(message);
-            }
-        }
+        return this.groups.remove(group);
     }
 
     /**
@@ -195,8 +90,8 @@ public class ConnectionPool {
      *
      * @param handler the ChatServerHandler to be removed
      */
-    public void removeUser(ChatServerHandler handler) {
-        connections.remove(handler);
+    public void removeHandler(ChatServerHandler handler) {
+        handlers.remove(handler);
     }
 
     /**
@@ -206,31 +101,9 @@ public class ConnectionPool {
      * @return true if the username is already taken, false otherwise
      */
     public boolean isUsernameTaken(String username) {
-        for (ChatServerHandler handler : this.connections) {
-            if (handler.getClientName() != null && handler.getClientName().equals(username)) {
-                return true;
-            }
+        if (handlers.stream().anyMatch(h -> h.getUser().getUserName().equals(username))) {
+            return true;
         }
-        for (Group group : this.groups) {
-            if (group.getGroupName().equals(username)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Returns an array of strings containing the names of all connected users.
-     *
-     * @return an array of strings representing the names of all connected users
-     */
-    public String[] getUserList() {
-        List<String> users = new ArrayList<>();
-        for (ChatServerHandler handler : this.connections) {
-            if (handler.getClientName() != null) {
-                users.add(handler.getClientName());
-            }
-        }
-        return users.toArray(new String[0]);
+        return groups.stream().anyMatch(g -> g.getGroupName().equals(username));
     }
 }
