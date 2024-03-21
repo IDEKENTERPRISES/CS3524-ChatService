@@ -6,24 +6,24 @@ import server.ChatServerHandler;
 import server.ConnectionPool;
 
 public class UnregisterRequest extends Request{
-    public UnregisterRequest(Matcher matcher) {
-    }
+	public UnregisterRequest(Matcher matcher) {
+	}
 
-    public UnregisterRequest() {
-        // only for RequestFactory
-    }
+	public UnregisterRequest() {
+		// only for RequestFactory
+	}
 
-    @Override
-    public void execute(ChatServerHandler handler, ConnectionPool pool) {
-        if (!this.checkAuthorizationAndSendError(handler, pool)) {
-            return;
-        }
-        pool.removeHandler(handler);
-        this.sendOKResponse(handler, pool, "Unregistered successfully.");
-    }
+	@Override
+	public void execute(ChatServerHandler handler, ConnectionPool pool) {
+		if (!this.checkAuthorizationAndSendError(handler, pool)) {
+			return;
+		}
+		pool.removeHandler(handler);
+		this.sendOKResponse(handler, pool, "Unregistered successfully.");
+	}
 
-    @Override
-    public Pattern getPattern() {
-        return Pattern.compile("^UNREGISTER$");
-    }
+	@Override
+	public Pattern getPattern() {
+		return Pattern.compile("^UNREGISTER$");
+	}
 }

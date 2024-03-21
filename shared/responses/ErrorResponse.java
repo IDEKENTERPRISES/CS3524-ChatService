@@ -3,7 +3,7 @@ import shared.User;
 
 public class ErrorResponse extends MessageResponse {
 
-    public ErrorResponse(User source, String messageBody) {
-        super(source, messageBody);
-    }
+	public ErrorResponse(User source, String messageBody) {
+		super(source, messageBody);
+	}
 }
