@@ -1,13 +1,11 @@
 package shared;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
-import server.ConnectionPool;
-
-public class Group implements Recipient{
-	private String groupName;
-	private List<User> members;
+public class Group {
+    private String groupName;
+    private Set<User> members;
 
     /**
      * Constructs a new Group object with the specified group name and members.
@@ -15,10 +13,9 @@ public class Group implements Recipient{
      * @param groupName the name of the group
      * @param owner   the owner of the group
      */
-    public Group(String groupName, User creator) {
-		this.groupName = groupName;
-		this.members = new ArrayList<User>();
-		this.members.add(creator);
+    public Group(String groupName) {
+        this.groupName = groupName;
+        this.members = new HashSet<User>();
     }
 
     /**
@@ -26,8 +23,8 @@ public class Group implements Recipient{
      *
      * @param user the member to be added
      */
-	public void addMember(User user) {
-		this.members.add(user);
+    public void addMember(User user) {
+        this.members.add(user);
     }
 
     /**
@@ -35,8 +32,8 @@ public class Group implements Recipient{
      *
      * @param user the member to be removed
      */
-	public void removeMember(User user) {
-		this.members.removeIf(m -> m.equals(user));
+    public void removeMember(User user) {
+        this.members.removeIf(m -> m.equals(user));
     }
 
     /**
@@ -44,8 +41,8 @@ public class Group implements Recipient{
      *
      * @param user the user to check
      */
-	public boolean hasMember(User user) {
-		return this.members.contains(user);
+    public boolean hasMember(User user) {
+        return this.members.contains(user);
     }
 
     /**
@@ -62,7 +59,7 @@ public class Group implements Recipient{
      *
      * @return an array of strings representing the members of the group
      */
-    public List<User> getMembers() {
+    public Set<User> getMembers() {
         return this.members;
     }
 
@@ -73,20 +70,10 @@ public class Group implements Recipient{
      */
     @Override
     public String toString() {
-		String memberString = "";
-		for (User user : members) {
-			memberString += user + ", ";
-		}
-		return memberString;
+        String memberString = "";
+        for (User user : members) {
+            memberString += user + ", ";
+        }
+        return memberString;
     }
-
-	@Override
-	public void sendMessage(ConnectionPool pool, Message message) {
-		var groupMessage = new GroupMessage(this, message);
-		for (User user : members) {
-			user.sendMessage(pool, groupMessage);
-		}
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'sendMessage'");
-	}
 }
