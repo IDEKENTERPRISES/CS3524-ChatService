@@ -14,6 +14,8 @@ import java.util.Scanner;
 
 public class Client {
 
+	/* TEST */
+
 	private final String host;
 	private final int port;
 	private User user;
