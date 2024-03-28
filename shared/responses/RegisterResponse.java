@@ -13,6 +13,6 @@ public class RegisterResponse extends Response {
 	@Override
 	public void execute(Client client) {
 		client.setUser(user);
-		System.out.println("Successfully registered as " + user.getUserName());
+		client.printMessage("Successfully registered as " + user.getUserName());
 	}
 }

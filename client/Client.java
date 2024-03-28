@@ -25,6 +25,8 @@ public class Client {
 	private Thread listenerThread;
 	private boolean exitFlag;
 
+	private static final String ANSI_CLEAR_LINE = "\u001B[2K";
+
 	/**
 	 * Represents a client that connects to a server using a specified host and
 	 * port.
@@ -96,6 +98,28 @@ public class Client {
 			this.exitFlag = true;
 		}
 		return messageBody;
+	}
+
+	/**
+	 * Force reads user input from the scanner.
+	 *
+	 * @return the user input as a String
+	 */
+
+	private String readUserInput() {
+		if (this.scanner.hasNextLine()) {
+			return this.scanner.nextLine();
+		}
+		return "";
+	}
+
+	public void printMessage(String message) {
+		var input = readUserInput();
+		System.out.print(ANSI_CLEAR_LINE);
+
+		System.out.println(message);
+
+		System.out.print("Please Input" + message);
 	}
 
 	/**

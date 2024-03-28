@@ -14,6 +14,6 @@ public class MessageResponse extends Response {
 
 	@Override
 	public void execute(Client client) {
-		System.out.println(source.getUserName() + ": " + this.messageBody);
+		client.printMessage(source.getUserName() + ": " + this.messageBody);
 	}
 }
