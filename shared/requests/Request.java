@@ -36,7 +36,7 @@ public abstract class Request implements Serializable{
 		return null;
 	}
 
-	public abstract Pattern getPattern();
-
 	public abstract void execute(ChatServerHandler handler, ConnectionPool pool);
+
+	public abstract Pattern getPattern();
 }
