@@ -92,8 +92,7 @@ public class ChatServerHandler implements Runnable {
 
 	/**
 	 * Sends a response to the client
-	 * @param response
-	 */
+     */
 	public void sendResponse(Response response) {
 		try {
 			this.outputStream.writeObject(response);

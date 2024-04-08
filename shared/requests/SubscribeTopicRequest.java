@@ -13,10 +13,12 @@ public class SubscribeTopicRequest extends Request {
 		this.topicName = topicName;
 	}
 
+	@SuppressWarnings("unused")
 	public SubscribeTopicRequest(Matcher matcher) {
 		this(matcher.group(1));
 	}
 
+	@SuppressWarnings("unused")
 	public SubscribeTopicRequest() {
 		// only for RequestFactory
 	}

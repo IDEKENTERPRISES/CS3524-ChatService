@@ -7,8 +7,8 @@ import server.ConnectionPool;
 import shared.responses.Response;
 
 public class User implements Serializable{
-	private String username;
-	private UUID id;
+	private final String username;
+	private final UUID id;
 
 	/**
 	 * Constructs a new User object with the specified username.

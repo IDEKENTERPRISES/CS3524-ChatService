@@ -4,7 +4,7 @@ import client.Client;
 import shared.User;
 
 public class RegisterResponse extends Response {
-	private User user;
+	private final User user;
 
 	public RegisterResponse(User user) {
 		this.user = user;

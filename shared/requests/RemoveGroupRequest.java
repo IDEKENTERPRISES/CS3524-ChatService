@@ -13,10 +13,12 @@ public class RemoveGroupRequest extends Request {
 		this.groupName = groupName;
 	}
 
+	@SuppressWarnings("unused")
 	public RemoveGroupRequest(Matcher matcher) {
 		this(matcher.group(1));
 	}
 
+	@SuppressWarnings("unused")
 	public RemoveGroupRequest() {
 		// only for RequestFactory
 	}

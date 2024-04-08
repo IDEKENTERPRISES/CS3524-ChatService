@@ -13,10 +13,12 @@ public class LeaveGroupRequest extends Request {
 		this.groupName = groupName;
 	}
 
+	@SuppressWarnings("unused")
 	public LeaveGroupRequest(Matcher matcher) {
 		this(matcher.group(1));
 	}
 
+	@SuppressWarnings("unused")
 	public LeaveGroupRequest() {
 		// only for RequestFactory
 	}

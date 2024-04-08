@@ -4,8 +4,8 @@ import client.Client;
 import shared.User;
 
 public class MessageResponse extends Response {
-	private User source;
-	private String messageBody;
+	private final User source;
+	private final String messageBody;
 
 	public MessageResponse(User source, String messageBody) {
 		this.source = source;

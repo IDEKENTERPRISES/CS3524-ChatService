@@ -12,10 +12,12 @@ public class UnsubscribeTopicRequest extends Request {
 		this.topicName = topicName;
 	}
 
+	@SuppressWarnings("unused")
 	public UnsubscribeTopicRequest() {
 		// only for RequestFactory
 	}
 
+	@SuppressWarnings("unused")
 	public UnsubscribeTopicRequest(Matcher matcher) {
 		this(matcher.group(1));
 	}

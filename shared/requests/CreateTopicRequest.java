@@ -13,10 +13,12 @@ public class CreateTopicRequest extends Request{
 		this.topicName = topicName;
 	}
 
+	@SuppressWarnings("unused")
 	public CreateTopicRequest(Matcher matcher) {
 		this(matcher.group(1));
 	}
 
+	@SuppressWarnings("unused")
 	public CreateTopicRequest() {
 		// only for RequestFactory
 	}

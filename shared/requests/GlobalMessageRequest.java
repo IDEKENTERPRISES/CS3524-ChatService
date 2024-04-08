@@ -12,10 +12,12 @@ public class GlobalMessageRequest extends MessageRequest {
 		super(messageBody);
 	}
 
+	@SuppressWarnings("unused")
 	public GlobalMessageRequest(Matcher matcher) {
 		this(matcher.group(1));
 	}
 
+	@SuppressWarnings("unused")
 	public GlobalMessageRequest() {
 		// only for RequestFactory
 	}

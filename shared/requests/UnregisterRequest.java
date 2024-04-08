@@ -6,9 +6,11 @@ import server.ChatServerHandler;
 import server.ConnectionPool;
 
 public class UnregisterRequest extends Request{
+	@SuppressWarnings("unused")
 	public UnregisterRequest(Matcher matcher) {
 	}
 
+	@SuppressWarnings("unused")
 	public UnregisterRequest() {
 		// only for RequestFactory
 	}

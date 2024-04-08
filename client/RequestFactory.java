@@ -52,7 +52,6 @@ public class RequestFactory {
 
 			} catch (Exception e) {
 				e.printStackTrace();
-				continue;
 			}
 		}
 		return null;

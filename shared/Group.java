@@ -4,8 +4,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class Group {
-	private String groupName;
-	private Set<User> members;
+	private final String groupName;
+	private final Set<User> members;
 
 	/**
 	 * Constructs a new Group object with the specified group name and members.
@@ -14,7 +14,7 @@ public class Group {
 	 */
 	public Group(String groupName) {
 		this.groupName = groupName;
-		this.members = new HashSet<User>();
+		this.members = new HashSet<>();
 	}
 
 	/**
@@ -69,10 +69,10 @@ public class Group {
 	 */
 	@Override
 	public String toString() {
-		String memberString = "";
+		StringBuilder memberString = new StringBuilder();
 		for (User user : members) {
-			memberString += user + ", ";
+			memberString.append(user).append(", ");
 		}
-		return memberString;
+		return memberString.toString();
 	}
 }

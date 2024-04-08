@@ -14,10 +14,9 @@ import java.util.Scanner;
 
 public class Client {
 
-	/* TEST */
-
 	private final String host;
 	private final int port;
+	@SuppressWarnings("unused")
 	private User user;
 	private Socket socket;
 	private Scanner scanner;

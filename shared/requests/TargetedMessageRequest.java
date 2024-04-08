@@ -17,10 +17,12 @@ public class TargetedMessageRequest extends MessageRequest {
 		this.targetName = targetName;
 	}
 
+	@SuppressWarnings("unused")
 	public TargetedMessageRequest(Matcher matcher) {
 		this(matcher.group(2), matcher.group(1));
 	}
 
+	@SuppressWarnings("unused")
 	public TargetedMessageRequest() {
 		// only for RequestFactory
 	}

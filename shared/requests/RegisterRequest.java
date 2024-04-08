@@ -14,10 +14,12 @@ public class RegisterRequest extends Request {
 		this.userName = userName;
 	}
 
+	@SuppressWarnings("unused")
 	public RegisterRequest(Matcher matcher) {
 		this(matcher.group(1));
 	}
 
+	@SuppressWarnings("unused")
 	public RegisterRequest() {
 		// only for RequestFactory
 	}

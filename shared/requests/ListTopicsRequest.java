@@ -11,6 +11,7 @@ public class ListTopicsRequest extends Request {
 
 	}
 
+	@SuppressWarnings("unused")
 	public ListTopicsRequest(Matcher matcher) {
 		this();
 	}

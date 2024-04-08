@@ -4,13 +4,14 @@ import shared.Group;
 import shared.User;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 public class ConnectionPool {
 	public final User SERVER = new User("Server");
-	private Set<ChatServerHandler> handlers = new HashSet<>();
-	private Set<Group> groups = new HashSet<>();
+	private final Set<ChatServerHandler> handlers = new HashSet<>();
+	private final Set<Group> groups = new HashSet<>();
 
 	/**
 	 * Adds a connection to the connection pool.
@@ -28,8 +29,8 @@ public class ConnectionPool {
 	 */
 	public Set<User> getUsers() {
 		return handlers.stream()
-			.map(h -> h.getUser())
-			.filter(u -> u != null)
+			.map(ChatServerHandler::getUser)
+			.filter(Objects::nonNull)
 			.collect(Collectors.toSet());
 	}
 
@@ -41,16 +42,6 @@ public class ConnectionPool {
 	 */
 	public void createGroup(String groupName) {
 		this.groups.add(new Group(groupName));
-	}
-
-	/**
-	 * Removes a group from the group list, only if it has less than 2 members.
-	 *
-	 * @param groupName the group to be removed
-	 * @return true if the group was removed, false otherwise
-	 */
-	public boolean removeGroup(String groupName) {
-		return this.groups.removeIf(g -> g.getGroupName().equals(groupName) && g.getMembers().size() < 2);
 	}
 
 	/**
@@ -75,7 +66,7 @@ public class ConnectionPool {
 	 */
 	public User getUser(String username) {
 		return handlers.stream()
-			.map(h -> h.getUser())
+			.map(ChatServerHandler::getUser)
 			.filter(u -> u != null && u.getUserName().equals(username))
 			.findFirst()
 			.orElse(null);
@@ -113,18 +104,5 @@ public class ConnectionPool {
 	 */
 	public boolean removeHandler(ChatServerHandler handler) {
 		return this.handlers.remove(handler);
-	}
-
-	/**
-	 * Checks if a username is already taken by any connected client or group.
-	 *
-	 * @param username the username to check
-	 * @return true if the username is already taken, false otherwise
-	 */
-	public boolean isUsernameTaken(String username) {
-		if (handlers.stream().anyMatch(h -> h.getUser().getUserName().equals(username))) {
-			return true;
-		}
-		return groups.stream().anyMatch(g -> g.getGroupName().equals(username));
 	}
 }
