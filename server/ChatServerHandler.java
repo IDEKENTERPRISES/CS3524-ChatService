@@ -51,6 +51,16 @@ public class ChatServerHandler implements Runnable {
 	}
 
 	/**
+	 * Returns the username of the user associated with this ChatServerHandler.
+	 *
+	 * @return the username of the user associated with this ChatServerHandler
+	 * 	   or "Unknown user" if the user is null
+	 */
+	private String getUsername() {
+		return this.user == null ? "Unknown user" : this.user.getUserName();
+	}
+
+	/**
 	 * Core server thread loop
 	 */
 	@Override
@@ -75,12 +85,12 @@ public class ChatServerHandler implements Runnable {
 				}
 			}
 		} catch (IOException | ClassNotFoundException e) {
-			e.printStackTrace(); // TODO handle this error
+			System.out.println("IOException or ClassNotFoundException occured in inputStream.readObject for user: " + this.getUsername());
 		} finally {
 			try {
 				this.socket.close();
 			} catch (IOException e) {
-				e.printStackTrace(); // TODO handle this error
+				System.out.println("IOException occured in socket.close for user: " + this.getUsername());
 			} finally {
 				ConnectionPool actualPool = pool.get();
 				if (actualPool != null) {
@@ -97,7 +107,7 @@ public class ChatServerHandler implements Runnable {
 		try {
 			this.outputStream.writeObject(response);
 		} catch (IOException e) {
-			e.printStackTrace(); // TODO handle this error
+			System.out.println("IOException occured in outputStream.writeObject for user: " + this.getUsername());
 		}
 	}
 
