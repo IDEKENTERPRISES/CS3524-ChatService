@@ -34,6 +34,12 @@ public class JoinGroupRequest extends Request {
 			this.sendErrorResponse(handler, pool, "Group does not exist.");
 			return;
 		}
+
+		if (group.hasMember(handler.getUser())) {
+			this.sendErrorResponse(handler, pool, "You are already a member of this group.");
+			return;
+		}
+
 		group.addMember(handler.getUser());
 
 		this.sendOKResponse(handler, pool, "Joined group successfully.");
