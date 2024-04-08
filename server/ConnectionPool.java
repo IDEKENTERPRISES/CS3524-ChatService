@@ -87,7 +87,7 @@ public class ConnectionPool {
 	/**
 	 * Removes a group from the group list,
 	 * should only be used if the group has no members, does not notify users
-	 * TODO These checks are currently not performed!
+	 *
 	 *
 	 * @param group the group to be removed
 	 * @return true if the group was removed, false otherwise

@@ -5,6 +5,8 @@ import java.util.regex.Pattern;
 
 import server.ChatServerHandler;
 import server.ConnectionPool;
+import shared.User;
+import shared.responses.MessageResponse;
 
 public class RemoveGroupRequest extends Request {
 	private String groupName;
@@ -33,6 +35,10 @@ public class RemoveGroupRequest extends Request {
 		if (group == null) {
 			this.sendErrorResponse(handler, pool, "Group does not exist.");
 			return;
+		}
+
+		for (User user : group.getMembers()) {
+			user.sendResponse(pool, new MessageResponse(user, "Group " + group.getGroupName() + " has been removed."));
 		}
 
 		pool.removeGroup(group);
