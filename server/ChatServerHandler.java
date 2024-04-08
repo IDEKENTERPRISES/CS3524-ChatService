@@ -40,10 +40,19 @@ public class ChatServerHandler implements Runnable {
 		}
 	}
 
+	/**
+	 * Sets the user associated with this ChatServerHandler.
+	 * This is assigned by the server
+	 *
+	 * @param user the user to associate with this ChatServerHandler
+	 */
 	public void setUser(User user) {
 		this.user = user;
 	}
 
+	/**
+	 * Core server thread loop
+	 */
 	@Override
 	public void run() {
 		try {
@@ -81,6 +90,10 @@ public class ChatServerHandler implements Runnable {
 		}
 	}
 
+	/**
+	 * Sends a response to the client
+	 * @param response
+	 */
 	public void sendResponse(Response response) {
 		try {
 			this.outputStream.writeObject(response);
@@ -90,9 +103,9 @@ public class ChatServerHandler implements Runnable {
 	}
 
 	/**
-	 * Returns the client name associated with this ChatServerHandler.
+	 * Returns the client associated with this ChatServerHandler.
 	 *
-	 * @return the client name
+	 * @return the client
 	 */
 	public User getUser() {
 		return this.user;

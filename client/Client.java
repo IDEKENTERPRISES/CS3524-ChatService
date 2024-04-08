@@ -41,14 +41,32 @@ public class Client {
 		this.exitFlag = false;
 	}
 
+	/**
+	 * Creates a request object from a string.
+	 * The string is matched against the pattern of each request type.
+	 * If a match is found, the request object is created and returned.
+	 *
+	 * @param commandString the string to parse
+	 * @return the request object, or null if no match is found
+	 */
 	private Request getRequestFromString(String commandString) {
 		return RequestFactory.createRequest(commandString);
 	}
 
+	/**
+	 * Sets the user associated with this client.
+	 *
+	 * @param user the user to associate
+	 */
 	public void setUser(User user) {
 		this.user = user;
 	}
 
+	/**
+	 * Sends a request to the server.
+	 *
+	 * @param request the request to send
+	 */
 	private void sendRequest(Request request) {
 		try {
 			this.outputStream.writeObject(request);
@@ -148,6 +166,10 @@ public class Client {
 		this.handleUserInput();
 	}
 
+	/**
+	 * Receives a response from the server and executes it.
+	 * @throws IOException if inputStream.readObject throws
+	 */
 	private void receiveResponse() throws IOException {
 		try {
 			Object in = this.inputStream.readObject();

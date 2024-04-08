@@ -10,15 +10,30 @@ public class User implements Serializable{
 	private String username;
 	private UUID id;
 
+	/**
+	 * Constructs a new User object with the specified username.
+	 *
+	 * @param username the username of the user
+	 */
 	public User(String username) {
 		this.username = username;
 		this.id = UUID.randomUUID();
 	}
 
+	/**
+	 * Returns the username of the user.
+	 *
+	 * @return the username of the user as a String
+	 */
 	public String getUserName() {
 		return this.username;
 	}
 
+	/**
+	 * Returns the ID of the user.
+	 *
+	 * @return the ID of the user as a UUID
+	 */
 	public UUID getId() {
 		return this.id;
 	}
@@ -47,6 +62,12 @@ public class User implements Serializable{
 		return this.username;
 	}
 
+	/**
+	 * Sends a response to the client.
+	 *
+	 * @param pool    the connection pool
+	 * @param command the response to send
+	 */
 	public void sendResponse(ConnectionPool pool, Response command) {
 		pool.getHandler(this).sendResponse(command);
 	}

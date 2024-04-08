@@ -11,7 +11,6 @@ public class Group {
 	 * Constructs a new Group object with the specified group name and members.
 	 *
 	 * @param groupName the name of the group
-	 * @param owner   the owner of the group
 	 */
 	public Group(String groupName) {
 		this.groupName = groupName;
@@ -57,7 +56,7 @@ public class Group {
 	/**
 	 * Returns the members of the group.
 	 *
-	 * @return an array of strings representing the members of the group
+	 * @return the members of the group as a Set
 	 */
 	public Set<User> getMembers() {
 		return this.members;
