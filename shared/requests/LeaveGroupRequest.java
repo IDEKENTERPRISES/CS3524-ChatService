@@ -34,8 +34,8 @@ public class LeaveGroupRequest extends Request {
 			this.sendErrorResponse(handler, pool, "Group does not exist.");
 			return;
 		}
-		group.removeMember(handler.getUser());
 
+		group.removeMember(handler.getUser());
 		this.sendOKResponse(handler, pool, "Left group successfully.");
 	}
 

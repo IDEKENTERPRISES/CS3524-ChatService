@@ -41,7 +41,6 @@ public class JoinGroupRequest extends Request {
 		}
 
 		group.addMember(handler.getUser());
-
 		this.sendOKResponse(handler, pool, "Joined group successfully.");
 	}
 

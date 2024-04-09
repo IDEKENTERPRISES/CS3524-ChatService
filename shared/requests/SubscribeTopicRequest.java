@@ -25,8 +25,23 @@ public class SubscribeTopicRequest extends Request {
 
 	@Override
 	public void execute(ChatServerHandler handler, ConnectionPool pool) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'execute'");
+		if (!this.checkAuthorizationAndSendError(handler, pool)) {
+			return;
+		}
+
+		var topic = pool.getTopic(this.topicName);
+		if (topic == null) {
+			this.sendErrorResponse(handler, pool, "Topic does not exist.");
+			return;
+		}
+
+		if (topic.hasSubscriber(handler.getUser())) {
+			this.sendErrorResponse(handler, pool, "You are already subscribed to this topic.");
+			return;
+		}
+
+		topic.addSubscriber(handler.getUser());
+		this.sendOKResponse(handler, pool, "Subscribed successfully.");
 	}
 
 	@Override

@@ -3,7 +3,6 @@ package shared;
 import java.util.HashSet;
 import java.util.Set;
 
-
 public class Topic {
     private final String topicName;
     private final Set<User> subscribers;
@@ -26,6 +25,16 @@ public class Topic {
     public void addSubscriber(User user) {
         this.subscribers.add(user);
     }
+
+    /**
+     * Unsubscribes a user from the topic.
+     * 
+     * @param user the subscriber to remove
+     */
+    public void removeSubscriber(User user) {
+        this.subscribers.removeIf(s -> s.equals(user));
+    }
+
 
     /**
      * Checks if a user is already a subscriber of the topic

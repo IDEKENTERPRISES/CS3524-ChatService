@@ -25,8 +25,20 @@ public class CreateTopicRequest extends Request{
 
 	@Override
 	public void execute(ChatServerHandler handler, ConnectionPool pool) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'execute'");
+		if (!this.checkAuthorizationAndSendError(handler, pool)) {
+			return;
+		}
+		
+		if (pool.getTopic(this.topicName) != null) {
+			this.sendErrorResponse(handler, pool, "Topic already exists.");
+			return;
+		}
+
+		pool.createTopic(topicName);
+		this.sendOKResponse(handler, pool, "Topic created successfully.");
+		
+		var joinRequest = new SubscribeTopicRequest(topicName);
+		joinRequest.execute(handler, pool);
 	}
 
 	@Override

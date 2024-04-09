@@ -2,6 +2,7 @@ package server;
 
 import shared.Group;
 import shared.User;
+import shared.Topic;
 
 import java.util.HashSet;
 import java.util.Objects;
@@ -12,6 +13,7 @@ public class ConnectionPool {
 	public final User SERVER = new User("Server");
 	private final Set<ChatServerHandler> handlers = new HashSet<>();
 	private final Set<Group> groups = new HashSet<>();
+	private final Set<Topic> topics = new HashSet<>();
 
 	/**
 	 * Adds a connection to the connection pool.
@@ -38,7 +40,6 @@ public class ConnectionPool {
 	 * Creates a group in the group list.
 	 *
 	 * @param groupName the name of the group to be added
-	 *
 	 */
 	public void createGroup(String groupName) {
 		this.groups.add(new Group(groupName));
@@ -94,6 +95,42 @@ public class ConnectionPool {
 	 */
 	public boolean removeGroup(Group group) {
 		return this.groups.remove(group);
+	}
+
+	/**
+	 * Creates a topic in the topic list.
+	 * 
+	 * @param topicName the name of the topic to be added
+	 */
+	public void createTopic(String topicName) {
+		this.topics.add(new Topic(topicName));
+	}
+
+	/**
+	 * Gets the group with the given topicName
+	 * @param topicName the name of the topic to get
+	 * @return the topic with the given topicName, or null if no such topic exists
+	 */
+	public Topic getTopic(String topicName) {
+		for (Topic topic : topics) {
+			System.out.println(topicName + " " + topic.getTopicName() + " : " + topic.getTopicName().equals(topicName));
+		}
+		return topics.stream()
+			.filter(t -> t.getTopicName().equals(topicName))
+			.findFirst()
+			.orElse(null);
+	}
+
+	/**
+	 * Removes a topic from the topic list,
+	 * only to be used if the topic has no subscribers, does not notify users
+	 * 
+	 * 
+	 * @param topic the topic to be removed 
+	 * @return true if the topic was removed, false otherwise
+	*/
+	public boolean removeTopic(Topic topic) {
+		return this.topics.remove(topic);
 	}
 
 	/**
