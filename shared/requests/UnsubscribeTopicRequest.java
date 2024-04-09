@@ -24,8 +24,18 @@ public class UnsubscribeTopicRequest extends Request {
 
 	@Override
 	public void execute(ChatServerHandler handler, ConnectionPool pool) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'execute'");
+		if (!this.checkAuthorizationAndSendError(handler, pool)) {
+			return;
+		}
+
+		var topic = pool.getTopic(this.topicName);
+		if (topic == null) {
+			this.sendErrorResponse(handler, pool, "Topic does not exist.");
+			return;
+		}
+
+		topic.removeSubscriber(handler.getUser());
+		this.sendOKResponse(handler, pool, "Unsubscribed successfully.");
 	}
 
 	@Override
