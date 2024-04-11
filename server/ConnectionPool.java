@@ -134,6 +134,15 @@ public class ConnectionPool {
 	}
 
 	/**
+	 * Returns the set of topics, to use in listing the topics
+	 * 
+	 * @return Set<Topic> - set of topics
+	 */
+	public Set<Topic> getTopics() {
+		return topics;
+	}
+
+	/**
 	 * Removes the specified ChatServerHandler from the connection pool.
 	 *
 	 * @param handler the ChatServerHandler to be removed
