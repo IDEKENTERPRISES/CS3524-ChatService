@@ -20,9 +20,9 @@ public class ListTopicsResponse extends Response {
 
     @Override
     public void execute(Client client) {
-        client.setUser(this.user);
-        System.out.println("Available topics:");
-        for (Topic topic: this.topics) {
+        client.setUser(user);
+        System.out.println("\nAvailable topics:");
+        for (Topic topic: topics) {
             System.out.println(topic.getTopicName());
         }
     }

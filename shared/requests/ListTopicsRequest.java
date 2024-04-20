@@ -17,15 +17,14 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class ListTopicsRequest extends Request {
-	private User user;
 	
 	public ListTopicsRequest() {
-		this.user = null;
+
 	}
 
 	@SuppressWarnings("unused")
 	public ListTopicsRequest(Matcher matcher) {
-		this(matcher.group(1));
+		this();
 	}
 
 	@Override
@@ -34,8 +33,8 @@ public class ListTopicsRequest extends Request {
 			return;
 		}
 		
-		this.user = handler.getUser();
-		handler.sendResponse(new ListTopicsResponse(this.user, pool.getTopics()));
+		User user = handler.getUser();
+		handler.sendResponse(new ListTopicsResponse(user, pool.getTopics()));
 	}
 
 	@Override

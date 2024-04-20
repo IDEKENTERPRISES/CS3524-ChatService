@@ -1,9 +1,10 @@
 package shared;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-public class Topic {
+public class Topic implements Serializable{
     private final String topicName;
     private final Set<User> subscribers;
 
