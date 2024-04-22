@@ -1,7 +1,9 @@
 package shared.responses;
 
+import server.ConnectionPool;
 import client.Client;
 import shared.User;
+import shared.Topic;
 
 public class MessageResponse extends Response {
 	private final User source;

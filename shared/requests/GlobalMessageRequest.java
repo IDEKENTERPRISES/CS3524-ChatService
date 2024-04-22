@@ -6,6 +6,7 @@ import server.ChatServerHandler;
 import server.ConnectionPool;
 import shared.User;
 import shared.responses.MessageResponse;
+import shared.Topic;
 
 public class GlobalMessageRequest extends MessageRequest {
 	public GlobalMessageRequest(String messageBody) {
@@ -27,10 +28,26 @@ public class GlobalMessageRequest extends MessageRequest {
 		if (!this.checkAuthorizationAndSendError(handler, pool)) {
 			return;
 		}
-		var response = new MessageResponse(handler.getUser(), this.getMessageBody());
-		for (User user : pool.getUsers()) {
-			if (!user.equals(handler.getUser())) {
-				user.sendResponse(pool, response);
+		boolean isTopic = false;
+
+		for (Topic topic : pool.getTopics()) {
+			if (this.getMessageBody().contains(topic.getTopicName())) {
+				isTopic = true;
+
+				var response = new MessageResponse(handler.getUser(), this.getMessageBody());
+				for (User subscriber : topic.getSubscribers()) {
+					if(!subscriber.equals(handler.getUser())) {
+						subscriber.sendResponse(pool, response);
+					}
+				}
+			}
+		}
+		if (isTopic == false) {
+			var response = new MessageResponse(handler.getUser(), this.getMessageBody());
+			for (User user : pool.getUsers()) {
+				if (!user.equals(handler.getUser())) {
+					user.sendResponse(pool, response);
+				}
 			}
 		}
 	}
