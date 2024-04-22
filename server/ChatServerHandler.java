@@ -102,19 +102,6 @@ public class ChatServerHandler implements Runnable {
 	}
 
 	/**
-	 * Checks message for any Topic keywords
-	 * 
-	private Boolean processMessage(String message, ConnectionPool actualPool) {
-		for (Topic topic : actualPool.getTopics()) {
-			if (message.contains(topic.getTopicName())) {
-					return true;
-				}
-			}
-			return false;
-		}
-	*/
-
-	/**
 	 * Sends a response to the client
      */
 	public void sendResponse(Response response) {
