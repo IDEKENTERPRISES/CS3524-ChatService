@@ -143,6 +143,20 @@ public class ConnectionPool {
 	}
 
 	/**
+	 * Checks if keyword is already a topic.
+	 * 
+	 * @return true if topic exists, false otherwise
+	 */
+	public boolean isTopic(String keyword) {
+		for (Topic topic : topics) {
+			if (topic.getTopicName().equals(keyword)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
 	 * Removes the specified ChatServerHandler from the connection pool.
 	 *
 	 * @param handler the ChatServerHandler to be removed
