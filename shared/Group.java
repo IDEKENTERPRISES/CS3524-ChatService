@@ -7,6 +7,7 @@ import shared.responses.Response;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.StringJoiner;
 
 public class Group {
 	private final String groupName;
@@ -83,10 +84,10 @@ public class Group {
 	 */
 	@Override
 	public String toString() {
-		StringBuilder memberString = new StringBuilder();
+		StringJoiner joiner = new StringJoiner(", ");
 		for (User user : members) {
-			memberString.append(user).append(", ");
+			joiner.add(user.getUserName());
 		}
-		return memberString.toString();
+		return joiner.toString();
 	}
 }

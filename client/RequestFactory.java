@@ -27,6 +27,7 @@ public class RequestFactory {
         ListUsersRequest.class,
 		TopicMessageRequest.class,
 		TargetedTopicMessageRequest.class,
+		ListGroupUsersRequest.class,
 		GlobalMessageRequest.class
 
 	};
