@@ -25,7 +25,7 @@ public class RunClient {
 
 		try {
 			// Ask for new port number
-			System.out.print("Enter server port number (default 42069): ");
+			System.out.print("Enter server port number (default 42096): ");
 			String portStr = scanner.nextLine();
 
 			if (!portStr.isEmpty()) {

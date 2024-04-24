@@ -1,8 +1,8 @@
 package client;
 
-import java.util.regex.Matcher;
-
 import shared.requests.*;
+
+import java.util.regex.Matcher;
 
 public class RequestFactory {
 	/**
@@ -22,7 +22,9 @@ public class RequestFactory {
 		SubscribeTopicRequest.class,
 		UnsubscribeTopicRequest.class,
 		ListTopicsRequest.class,
+        ListUsersRequest.class,
 		GlobalMessageRequest.class
+
 	};
 
 	/**

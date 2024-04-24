@@ -1,9 +1,10 @@
 package shared.requests;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import server.ChatServerHandler;
 import server.ConnectionPool;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class UnregisterRequest extends Request{
 	@SuppressWarnings("unused")
