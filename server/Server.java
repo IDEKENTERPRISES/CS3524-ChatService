@@ -62,16 +62,20 @@ public class Server {
 		} catch (IOException e) {
 			System.out.println("Server exception: " + e.getMessage()); // Error handling for server setup.
 		}
-		while (true) {
-			// Waits for a client to connect and creates a handler for the client in a new thread.
-			ChatServerHandler handler = this.awaitClient();
-			if (handler == null) {
-				System.out.println("Handler is null...");
-				break;
-			}
-			Thread thread = new Thread(handler);
-			thread.start();
-		}
-		System.out.println("Server shutting down.");
+        try{
+            while (true) {
+                // Waits for a client to connect and creates a handler for the client in a new thread.
+                ChatServerHandler handler = this.awaitClient();
+                if (handler == null) {
+                    System.out.println("Handler is null...");
+                    break;
+                }
+                Thread thread = new Thread(handler);
+                thread.start();
+            }
+        } catch (Exception e) {
+            System.out.println("Server encountered an error: " + e.getMessage());
+        }
+        System.out.println("Server shutting down.");
 	}
 }
