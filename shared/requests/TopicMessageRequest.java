@@ -1,22 +1,25 @@
 package shared.requests;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.*;
+
 import server.ChatServerHandler;
 import server.ConnectionPool;
+import shared.User;
 import shared.responses.MessageResponse;
 
-public class GlobalMessageRequest extends MessageRequest {
-	public GlobalMessageRequest(String messageBody) {
+public class TopicMessageRequest extends MessageRequest {
+	public TopicMessageRequest(String messageBody) {
 		super(messageBody);
 	}
 
 	@SuppressWarnings("unused")
-	public GlobalMessageRequest(Matcher matcher) {
+	public TopicMessageRequest(Matcher matcher) {
 		this(matcher.group(1));
 	}
 
 	@SuppressWarnings("unused")
-	public GlobalMessageRequest() {
+	public TopicMessageRequest() {
 		// only for RequestFactory
 	}
 
@@ -25,19 +28,26 @@ public class GlobalMessageRequest extends MessageRequest {
 		if (!this.checkAuthorizationAndSendError(handler, pool)) {
 			return;
 		}
-		boolean isTopic = false;
 		var response = new MessageResponse(handler.getUser(), this.getMessageBody());
 
 		// topics handling
 		this.createTopicsFromHashes(pool);
-
-		pool.getUsers().stream()
-			.filter(r -> !handler.getUser().equals(r))
+		Set<User> recipients = this.getPotentialRecipients(pool);
+		recipients.remove(handler.getUser());
+		recipients.stream()
 			.forEach(r -> r.sendResponse(pool, response));
+	}
+
+	protected Set<User> getPotentialRecipients(ConnectionPool pool) {
+		Set<User> recipients = new HashSet<>();
+		pool.getTopics().stream()
+			.filter(t -> this.getMessageBody().contains(t.getTopicName()))
+			.forEach(t -> recipients.addAll(t.getSubscribers()));
+		return recipients;
 	}
 
 	@Override
 	public Pattern getPattern() {
-		return Pattern.compile("^(.+)$");
+		return Pattern.compile("^SHOUTTOPIC (.+)$");
 	}
 }

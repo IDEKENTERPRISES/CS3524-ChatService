@@ -23,6 +23,8 @@ public class RequestFactory {
 		UnsubscribeTopicRequest.class,
 		ListTopicsRequest.class,
         ListUsersRequest.class,
+		TopicMessageRequest.class,
+		TargetedTopicMessageRequest.class,
 		GlobalMessageRequest.class
 
 	};

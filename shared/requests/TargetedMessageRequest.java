@@ -1,15 +1,17 @@
 package shared.requests;
 
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import server.ChatServerHandler;
 import server.ConnectionPool;
 import shared.Group;
+import shared.Topic;
 import shared.User;
 import shared.responses.MessageResponse;
 
-public class TargetedMessageRequest extends MessageRequest {
+public class TargetedMessageRequest extends TopicMessageRequest {
 	private String targetName;
 
 	public TargetedMessageRequest(String messageBody, String targetName) {
@@ -51,9 +53,11 @@ public class TargetedMessageRequest extends MessageRequest {
 
 	private void sendGroupMessage(ChatServerHandler handler, ConnectionPool pool, Group group) {
 		var response = new MessageResponse(handler.getUser(), this.getMessageBody());
-		for (User user : group.getMembers()) {
-			user.sendResponse(pool, response);
-		}
+		// topics handling
+		this.createTopicsFromHashes(pool);
+		group.getMembers().stream()
+			.filter(m -> !handler.getUser().equals(m))
+			.forEach(m -> m.sendResponse(pool, response));
 	}
 
 	private void sendUserMessage(ChatServerHandler handler, ConnectionPool pool, User user) {
