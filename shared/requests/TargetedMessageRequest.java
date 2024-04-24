@@ -1,13 +1,11 @@
 package shared.requests;
 
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import server.ChatServerHandler;
 import server.ConnectionPool;
 import shared.Group;
-import shared.Topic;
 import shared.User;
 import shared.responses.MessageResponse;
 

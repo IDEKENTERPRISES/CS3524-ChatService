@@ -25,7 +25,6 @@ public class GlobalMessageRequest extends MessageRequest {
 		if (!this.checkAuthorizationAndSendError(handler, pool)) {
 			return;
 		}
-		boolean isTopic = false;
 		var response = new MessageResponse(handler.getUser(), this.getMessageBody());
 
 		// topics handling

@@ -3,8 +3,6 @@ package server;
 import shared.User;
 import shared.requests.Request;
 import shared.responses.Response;
-import shared.Topic;
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;

@@ -4,11 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import server.ChatServerHandler;
 import server.ConnectionPool;
-import shared.Topic;
-import shared.User;
-import shared.responses.MessageResponse;
 
 public abstract class MessageRequest extends Request {
 	private String messageBody;
@@ -58,6 +54,4 @@ public abstract class MessageRequest extends Request {
 		}
 		return created;
 	}
-
-
 }

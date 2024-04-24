@@ -33,19 +33,21 @@ public class TargetedTopicMessageRequest extends MessageRequest {
 
 		// topics handling
 		this.createTopicsFromHashes(pool);
-		Set<User> recipients = this.getPotentialRecipients(pool);
-		recipients.remove(handler.getUser());
-		System.out.println(recipients.size());
-		recipients.stream()
-			.forEach(r -> r.sendResponse(pool, response));
-	}
 
-	private Set<User> getPotentialRecipients(ConnectionPool pool) {
+		var group = pool.getGroup(targetName);
+		if (group == null) {
+			this.sendErrorResponse(handler, pool, "Group not found.");
+		}
+
 		Set<User> recipients = new HashSet<>();
 		pool.getTopics().stream()
 			.filter(t -> this.getMessageBody().contains(t.getTopicName()))
-			.forEach(t -> recipients.addAll(t.getSubscribers()));
-		return recipients;
+			.forEach(t -> t.getSubscribers().stream()
+				.filter(r -> group.hasMember(r))
+				.forEach(r -> recipients.add(r)));
+		recipients.remove(handler.getUser());
+		recipients.stream()
+			.forEach(r -> r.sendResponse(pool, response));
 	}
 
 	@Override

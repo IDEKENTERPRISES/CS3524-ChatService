@@ -117,16 +117,16 @@ public class ConnectionPool {
 		}
 		return topics.stream()
 			.filter(t -> t.getTopicName().equals(topicName))
-			.findFirst()
+			.findAny()
 			.orElse(null);
 	}
 
 	/**
 	 * Removes a topic from the topic list,
 	 * only to be used if the topic has no subscribers, does not notify users
-	 * 
-	 * 
-	 * @param topic the topic to be removed 
+	 *
+	 *
+	 * @param topic the topic to be removed
 	 * @return true if the topic was removed, false otherwise
 	*/
 	public boolean removeTopic(Topic topic) {
@@ -135,7 +135,7 @@ public class ConnectionPool {
 
 	/**
 	 * Returns the set of topics, to use in listing the topics
-	 * 
+	 *
 	 * @return Set<Topic> - set of topics
 	 */
 	public Set<Topic> getTopics() {
@@ -144,16 +144,11 @@ public class ConnectionPool {
 
 	/**
 	 * Checks if keyword is already a topic.
-	 * 
+	 *
 	 * @return true if topic exists, false otherwise
 	 */
 	public boolean isTopic(String keyword) {
-		for (Topic topic : topics) {
-			if (topic.getTopicName().equals(keyword)) {
-				return true;
-			}
-		}
-		return false;
+		return this.getTopic(keyword) != null;
 	}
 
 	/**
