@@ -1,41 +1,107 @@
-## User Manual for Chat Client
+## Chat Client User Manual
 
-This manual will guide you through the functionalities of the chat client. 
+Welcome to the chat client! This manual will guide you through the basic functionalities of the client and explain how to use the available commands.
 
-### Getting Started
+### Connecting to the Server
 
-1. **Run the Client:**
-    - Open a terminal window.
-    - Navigate to the directory containing the `RunClient.java` file.
-    - Execute the command: `java RunClient.java`
-2. **Connect to Server:**
-    - You will be prompted to enter the server hostname (default is localhost) and port number (default is 42096).
-    - If you are connecting to a server on your local machine, you can leave the defaults.
-    - If connecting to a remote server, enter the correct hostname and port number.
+1. **Launch the client application.**
+2. **Enter the server hostname.** 
+    * This is usually "localhost" if the server is running on the same machine. 
+    * You can press enter to use the default hostname.
+3. **Enter the server port number.**
+    * The default port is 42069. 
+    * You can press enter to use the default port.
 
-### Basic Commands
+### Registering a Username
 
-Once connected, you can use the following commands:
+* Before you can send messages, you need to register a username.
+* Use the following command to register:
+    ```
+    REGISTER <username>
+    ```
+    * Replace `<username>` with your desired username. 
 
-* **`REGISTER <username>`:** Register with a unique username.
-* **`UNREGISTER`:** Unregister from the server. 
-* **`SEND <username> <message>`:** Send a private message to a specific user.
-* **`SEND <groupname> <message>`:** Send a message to a specific group.
-* **`<message>`:** Send a message to the global chat. 
-* **`CREATE <groupname>`:** Create a new group.
-* **`JOIN <groupname>`:** Join an existing group.
-* **`LEAVE <groupname>`:** Leave a group. 
-* **`REMOVE <groupname>`:** Remove a group (only if you created it and it has no members).
-* **`TOPIC <topicname>`:** Create a new topic.
-* **`SUBSCRIBE <topicname>`:** Subscribe to a topic to receive messages containing the topic name.
-* **`UNSUBSCRIBE <topicname>`:** Unsubscribe from a topic.
-* **`TOPICS`:** List all available topics.
-* **`#<topicname>`:** Include a topic name in your message with a hashtag to send it to subscribers of that topic.
+### Sending Messages
 
-### Additional Notes:
+* Once you are registered, you can send messages to other users.
 
-* Messages containing topic names (with hashtags) will be sent to both the global chat and the subscribers of that topic. 
-* You can include multiple topic names in a single message.
-* Use the `exit` command or press `Ctrl+C` to exit the client.
+**Global Messages:**
+* To send a message to all connected users, simply type your message and press enter. 
 
-## Enjoy chatting!
+**Targeted Messages:**
+* To send a message to a specific user, use the following command:
+    ```
+    SEND <username> <message>
+    ```
+    * Replace `<username>` with the target user's username.
+    * Replace `<message>` with the message you want to send.
+
+**Group Messages:**
+* To send a message to a specific group, use the following command:
+    ```
+    SEND <groupname> <message>
+    ```
+    * Replace `<groupname>` with the target group's name.
+    * Replace `<message>` with the message you want to send.
+
+### Creating and Joining Groups
+
+* You can create and join groups to facilitate conversations with multiple users.
+
+**Create a Group:**
+    ```
+    CREATE <groupname>
+    ```
+
+**Join a Group:**
+    ```
+    JOIN <groupname>
+    ```
+
+**Leave a Group:**
+    ```
+    LEAVE <groupname>
+    ```
+
+**Remove a Group:**
+    ```
+    REMOVE <groupname>
+    ```
+
+### Using Topics
+
+* Topics allow you to subscribe to specific keywords and receive messages related to those keywords.
+
+**Create a Topic:**
+* Topics are automatically created when you use a hashtag (#) followed by a keyword in your message.
+
+**Subscribe to a Topic:**
+    ```
+    SUBSCRIBE <topicname>
+    ```
+
+**Unsubscribe from a Topic:**
+    ```
+    UNSUBSCRIBE <topicname>
+    ```
+
+**List Available Topics:**
+    ```
+    TOPICS
+    ```
+
+### Exiting the Client
+
+* To exit the client, type the following command and press enter:
+    ```
+    EXIT
+    ```
+
+### Additional Notes
+
+* All commands are case-insensitive.
+* You can use the up and down arrow keys to navigate through your command history.
+* The server will automatically disconnect you if you are idle for too long. 
+
+
+***Enjoy your chat!***
