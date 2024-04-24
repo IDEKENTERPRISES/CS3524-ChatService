@@ -2,6 +2,7 @@ package shared.requests;
 
 import server.ChatServerHandler;
 import server.ConnectionPool;
+import shared.User;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -21,8 +22,9 @@ public class UnregisterRequest extends Request{
 		if (!this.checkAuthorizationAndSendError(handler, pool)) {
 			return;
 		}
+
+        User user = handler.getUser();
 		pool.removeHandler(handler);
-		this.sendOKResponse(handler, pool, "Unregistered successfully.");
 	}
 
 	@Override

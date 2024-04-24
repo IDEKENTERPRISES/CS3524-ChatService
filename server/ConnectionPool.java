@@ -3,6 +3,8 @@ package server;
 import shared.Group;
 import shared.User;
 import shared.Topic;
+import shared.responses.MessageResponse;
+import shared.responses.Response;
 
 import java.util.HashSet;
 import java.util.Objects;
@@ -21,7 +23,7 @@ public class ConnectionPool {
 	 * @param handler the ChatServerHandler representing the connection to be added
 	 */
 	public void addConnection(ChatServerHandler handler) {
-		handlers.add(handler);
+        handlers.add(handler);
 	}
 
 	/**
@@ -152,12 +154,17 @@ public class ConnectionPool {
 	}
 
 	/**
-	 * Removes the specified ChatServerHandler from the connection pool.
-	 *
-	 * @param handler the ChatServerHandler to be removed
-	 * @return true if the handler was removed, false otherwise
-	 */
-	public boolean removeHandler(ChatServerHandler handler) {
-		return this.handlers.remove(handler);
-	}
+     * Removes the specified ChatServerHandler from the connection pool.
+     *
+     * @param handler the ChatServerHandler to be removed
+     */
+	public void removeHandler(ChatServerHandler handler) {
+        String username = handler.getUser().getUserName();
+        this.handlers.remove(handler);
+
+        for (ChatServerHandler otherHandler: handlers) {
+            Response response = new MessageResponse(SERVER, username + " has left.");
+            otherHandler.sendResponse(response);
+        }
+    }
 }

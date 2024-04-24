@@ -3,16 +3,16 @@ package shared.responses;
 import client.Client;
 import shared.User;
 
-public class RegisterResponse extends Response {
+public class UnregisterResponse extends Response {
 	private final User user;
 
-	public RegisterResponse(User user) {
+	public UnregisterResponse(User user) {
 		this.user = user;
 	}
 
 	@Override
 	public void execute(Client client) {
 		client.setUser(user);
-		System.out.println(user.getUserName() + " has registered.");
+        System.out.printf("Server: %s has unregistered.%n", user.getUserName());
 	}
 }

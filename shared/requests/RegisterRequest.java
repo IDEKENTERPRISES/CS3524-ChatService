@@ -37,7 +37,12 @@ public class RegisterRequest extends Request {
 		}
 		var user = new User(this.userName);
 		handler.setUser(user);
-		handler.sendResponse(new RegisterResponse(user));
+
+        for (User usr: pool.getUsers()) {
+            pool.getHandler(usr).sendResponse(new RegisterResponse(user));
+        }
+
+
 	}
 
 	@Override
