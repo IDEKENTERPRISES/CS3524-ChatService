@@ -1,10 +1,10 @@
 package shared;
 
-import java.io.Serializable;
-import java.util.UUID;
-
 import server.ConnectionPool;
 import shared.responses.Response;
+
+import java.io.Serializable;
+import java.util.UUID;
 
 public class User implements Serializable{
 	private final String username;

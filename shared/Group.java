@@ -1,5 +1,10 @@
 package shared;
 
+import server.ChatServerHandler;
+import server.ConnectionPool;
+import shared.responses.GroupMessageResponse;
+import shared.responses.Response;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -61,6 +66,15 @@ public class Group {
 	public Set<User> getMembers() {
 		return this.members;
 	}
+
+    public void sendGroupMessage(ChatServerHandler handler, ConnectionPool pool, String message) {
+        Response response = new GroupMessageResponse(this.getGroupName(), handler.getUser(), message);
+        for (User user : this.getMembers()) {
+            if (user != handler.getUser()) {
+                user.sendResponse(pool, response);
+            }
+        }
+    }
 
 	/**
 	 * Returns a string representation of the Group object.

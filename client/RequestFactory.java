@@ -18,6 +18,8 @@ public class RequestFactory {
 		LeaveGroupRequest.class,
 		RemoveGroupRequest.class,
 		TargetedMessageRequest.class,
+        PrivateMessageRequest.class,
+        GroupMessageRequest.class,
 		CreateTopicRequest.class,
 		SubscribeTopicRequest.class,
 		UnsubscribeTopicRequest.class,

@@ -209,6 +209,7 @@ public class Client {
                 } else {
                     firstFailure = new Date();
                     System.err.println("\nFailed while listening to server...");
+                    e.printStackTrace();
                 }
 			}
 		}
