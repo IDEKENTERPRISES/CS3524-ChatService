@@ -1,7 +1,7 @@
 package client;
 
 import shared.User;
-import shared.requests.*;
+import shared.requests.Request;
 import shared.responses.Response;
 
 import java.io.IOException;
@@ -9,6 +9,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.time.Instant;
+import java.util.Date;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
@@ -189,17 +191,25 @@ public class Client {
 	 * message and continues listening.
 	 */
 	private void listenToServer() {
+        Date firstFailure = null;
 		while (!this.exitFlag) {
 			try {
 				// Receive an object from the server and print it
 				this.receiveResponse();
+                firstFailure = null;
 			} catch (IOException e) {
 				// Close the listener if the program has exited
 				if (this.exitFlag)
 					break;
-
-				// Otherwise print an error message and keep listening
-				System.err.println("Failed while listening to server.");
+                if (firstFailure != null) {
+                    if (firstFailure.before(Date.from(Instant.now().minusSeconds(3)))) {
+                        System.err.println("Failed while listening to server, timeout.");
+                        this.exitFlag = true;
+                    }
+                } else {
+                    firstFailure = new Date();
+                    System.err.println("\nFailed while listening to server...");
+                }
 			}
 		}
 	}
@@ -227,7 +237,7 @@ public class Client {
 		} catch (NullPointerException e) {
 			// The setup failed, nothing to do here
 		} catch (IOException e) {
-			System.err.println("Failed while closing the socket.");
+			System.err.println("\nFailed while closing the socket.");
 		}
 	}
 }
