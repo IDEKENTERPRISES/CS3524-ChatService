@@ -78,8 +78,15 @@ public class ChatServerHandler implements Runnable {
 				if (message instanceof Request) {
 					// Handle request
 					Request request = (Request) message;
-					request.execute(this, actualPool);
-				} else {
+                    ServerLogger.log(this.getUsername() + " - " + request); // Log the request
+                    request.execute(this, actualPool);
+				}
+//                else if (message instanceof Response) {
+//                    Response response = (Response) message;
+//                    ServerLogger.log("Server - " + response); // Log the response
+//                    this.sendResponse(response);
+//                }
+                else {
 					System.out.println("Unknown message type received");
 				}
 			}

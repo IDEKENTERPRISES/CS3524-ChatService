@@ -1,10 +1,10 @@
 package shared.requests;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import server.ChatServerHandler;
 import server.ConnectionPool;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class CreateTopicRequest extends Request{
 	private String topicName;
@@ -45,4 +45,9 @@ public class CreateTopicRequest extends Request{
 	public Pattern getPattern() {
 		return Pattern.compile("^TOPIC (\\w+)$");
 	}
+
+    @Override
+    public String toString() {
+        return ("CREATE " + topicName);
+    }
 }

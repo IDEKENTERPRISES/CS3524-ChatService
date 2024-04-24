@@ -1,10 +1,10 @@
 package shared.requests;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import server.ChatServerHandler;
 import server.ConnectionPool;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class SubscribeTopicRequest extends Request {
 	private String topicName;
@@ -48,4 +48,9 @@ public class SubscribeTopicRequest extends Request {
 	public Pattern getPattern() {
 		return Pattern.compile("^SUBSCRIBE (\\w+)$");
 	}
+
+    @Override
+    public String toString() {
+        return "SUBSCRIBE " + topicName;
+    }
 }

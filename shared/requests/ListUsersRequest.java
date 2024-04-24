@@ -38,4 +38,9 @@ public class ListUsersRequest extends Request {
     public Pattern getPattern() {
         return Pattern.compile("^LIST$");
     }
+
+    @Override
+    public String toString() {
+        return "LIST";
+    }
 }

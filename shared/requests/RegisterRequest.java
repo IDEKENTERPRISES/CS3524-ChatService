@@ -1,11 +1,12 @@
 package shared.requests;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import server.ChatServerHandler;
 import server.ConnectionPool;
 import shared.User;
 import shared.responses.RegisterResponse;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class RegisterRequest extends Request {
 	private String userName;
@@ -44,4 +45,8 @@ public class RegisterRequest extends Request {
 		return Pattern.compile("^REGISTER (\\w+)$");
 	}
 
+    @Override
+    public String toString() {
+        return "REGISTER " + userName;
+    }
 }

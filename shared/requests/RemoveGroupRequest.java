@@ -1,12 +1,12 @@
 package shared.requests;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import server.ChatServerHandler;
 import server.ConnectionPool;
 import shared.User;
 import shared.responses.MessageResponse;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class RemoveGroupRequest extends Request {
 	private String groupName;
@@ -50,4 +50,8 @@ public class RemoveGroupRequest extends Request {
 		return Pattern.compile("^REMOVE (\\w+)$");
 	}
 
+    @Override
+    public String toString() {
+        return "REMOVE " + groupName;
+    }
 }

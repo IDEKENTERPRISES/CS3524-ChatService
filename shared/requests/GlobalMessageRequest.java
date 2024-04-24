@@ -1,9 +1,11 @@
 package shared.requests;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
 import server.ChatServerHandler;
 import server.ConnectionPool;
 import shared.responses.MessageResponse;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class GlobalMessageRequest extends MessageRequest {
 	public GlobalMessageRequest(String messageBody) {
@@ -39,4 +41,9 @@ public class GlobalMessageRequest extends MessageRequest {
 	public Pattern getPattern() {
 		return Pattern.compile("^(.+)$");
 	}
+
+    @Override
+    public String toString() {
+        return getMessageBody();
+    }
 }

@@ -1,10 +1,10 @@
 package shared.requests;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import server.ChatServerHandler;
 import server.ConnectionPool;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class LeaveGroupRequest extends Request {
 	private String groupName;
@@ -44,4 +44,8 @@ public class LeaveGroupRequest extends Request {
 		return Pattern.compile("^LEAVE (\\w+)$");
 	}
 
+    @Override
+    public String toString() {
+        return ("LEAVE " + groupName);
+    }
 }

@@ -1,7 +1,5 @@
 package server;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.Scanner;
 
 /**
@@ -29,16 +27,6 @@ public class RunServer {
 			System.out.println("Invalid port number. Using default port.");
 		}
 		scanner.close();
-
-        try {
-            File myObj = new File("server-log.txt");
-            if (myObj.createNewFile()) {
-                System.out.println("File created: " + myObj.getName());
-            }
-        } catch (IOException e) {
-            System.out.println("An error occurred.");
-            e.printStackTrace();
-        }
 
 		// Create an instance of the EchoServer with the specified port number.
 		Server server = new Server(port);

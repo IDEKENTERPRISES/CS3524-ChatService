@@ -1,12 +1,14 @@
 package shared.requests;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.*;
 
 import server.ChatServerHandler;
 import server.ConnectionPool;
 import shared.User;
 import shared.responses.MessageResponse;
+
+import java.util.HashSet;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class TargetedTopicMessageRequest extends MessageRequest {
 	private String targetName;
@@ -43,8 +45,11 @@ public class TargetedTopicMessageRequest extends MessageRequest {
 		pool.getTopics().stream()
 			.filter(t -> this.getMessageBody().contains(t.getTopicName()))
 			.forEach(t -> t.getSubscribers().stream()
-				.filter(r -> group.hasMember(r))
-				.forEach(r -> recipients.add(r)));
+				.filter(r -> {
+                    assert group != null;
+                    return group.hasMember(r);
+                })
+				.forEach(recipients::add));
 		recipients.remove(handler.getUser());
 		recipients.stream()
 			.forEach(r -> r.sendResponse(pool, response));
@@ -54,4 +59,9 @@ public class TargetedTopicMessageRequest extends MessageRequest {
 	public Pattern getPattern() {
 		return Pattern.compile("^SENDTOPIC (\\w+) (.+)$");
 	}
+
+    @Override
+    public String toString() {
+        return "SENDTOPIC " + targetName + " " + getMessageBody();
+    }
 }

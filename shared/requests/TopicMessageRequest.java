@@ -1,12 +1,14 @@
 package shared.requests;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.*;
 
 import server.ChatServerHandler;
 import server.ConnectionPool;
 import shared.User;
 import shared.responses.MessageResponse;
+
+import java.util.HashSet;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class TopicMessageRequest extends MessageRequest {
 	public TopicMessageRequest(String messageBody) {
@@ -50,4 +52,9 @@ public class TopicMessageRequest extends MessageRequest {
 	public Pattern getPattern() {
 		return Pattern.compile("^SHOUTTOPIC (.+)$");
 	}
+
+    @Override
+    public String toString() {
+        return "SHOUTTOPIC " + getMessageBody();
+    }
 }

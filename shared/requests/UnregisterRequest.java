@@ -29,4 +29,9 @@ public class UnregisterRequest extends Request{
 	public Pattern getPattern() {
 		return Pattern.compile("^UNREGISTER$");
 	}
+
+    @Override
+    public String toString() {
+        return "UNREGISTER";
+    }
 }

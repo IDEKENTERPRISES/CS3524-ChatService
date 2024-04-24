@@ -44,4 +44,9 @@ public class GroupMessageRequest extends MessageRequest {
 	public Pattern getPattern() {
 		return Pattern.compile("^SENDGROUP (\\w+) (.+)$");
 	}
+
+    @Override
+    public String toString() {
+        return ("SENDGROUP " + targetName + " " + getMessageBody());
+    }
 }

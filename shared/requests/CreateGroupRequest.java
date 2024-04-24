@@ -1,10 +1,10 @@
 package shared.requests;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import server.ChatServerHandler;
 import server.ConnectionPool;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class CreateGroupRequest extends Request {
 	private String groupName;
@@ -45,4 +45,9 @@ public class CreateGroupRequest extends Request {
 	public Pattern getPattern() {
 		return Pattern.compile("^CREATE (\\w+)$");
 	}
+
+    @Override
+    public String toString() {
+        return ("CREATE " + groupName);
+    }
 }

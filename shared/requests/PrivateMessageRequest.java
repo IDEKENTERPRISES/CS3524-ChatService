@@ -52,4 +52,9 @@ public class PrivateMessageRequest extends MessageRequest {
 	public Pattern getPattern() {
 		return Pattern.compile("^SENDUSER (\\w+) (.+)$");
 	}
+
+    @Override
+    public String toString() {
+        return ("SENDUSER " + targetName + " " + getMessageBody());
+    }
 }

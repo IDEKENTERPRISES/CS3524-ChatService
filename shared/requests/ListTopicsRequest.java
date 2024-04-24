@@ -1,14 +1,12 @@
 package shared.requests;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import shared.User;
-
-import shared.responses.ListTopicsResponse;
-
 import server.ChatServerHandler;
 import server.ConnectionPool;
+import shared.User;
+import shared.responses.ListTopicsResponse;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ListTopicsRequest extends Request {
 
@@ -35,4 +33,9 @@ public class ListTopicsRequest extends Request {
 	public Pattern getPattern() {
 		return Pattern.compile("^TOPICS$");
 	}
+
+    @Override
+    public String toString() {
+        return "TOPICS";
+    }
 }

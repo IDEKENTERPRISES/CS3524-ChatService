@@ -58,4 +58,9 @@ public class TargetedMessageRequest extends MessageRequest {
 	public Pattern getPattern() {
 		return Pattern.compile("^SEND (\\w+) (.+)$");
 	}
+
+    @Override
+    public String toString() {
+        return "SEND " + targetName + " " + getMessageBody();
+    }
 }
