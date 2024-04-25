@@ -9,6 +9,7 @@ import shared.responses.Response;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 public class ConnectionPool {
@@ -101,7 +102,7 @@ public class ConnectionPool {
 
 	/**
 	 * Creates a topic in the topic list.
-	 * 
+	 *
 	 * @param topicName the name of the topic to be added
 	 */
 	public void createTopic(String topicName) {
@@ -142,6 +143,19 @@ public class ConnectionPool {
 	 */
 	public Set<Topic> getTopics() {
 		return topics;
+	}
+
+	/**
+	 * Returns the set of topics, to use in listing the topics
+	 *
+	 * @return Set<Topic> - set of topics
+	 */
+	public String getTopicsAsString() {
+		var joinedTopics = new StringJoiner(", ");
+		for (Topic topic : topics) {
+			joinedTopics.add(topic.getTopicName());
+		}
+		return joinedTopics.toString();
 	}
 
 	/**

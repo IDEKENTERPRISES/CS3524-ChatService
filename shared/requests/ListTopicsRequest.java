@@ -3,7 +3,7 @@ package shared.requests;
 import server.ChatServerHandler;
 import server.ConnectionPool;
 import shared.User;
-import shared.responses.ListTopicsResponse;
+import shared.responses.MessageResponse;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -26,7 +26,7 @@ public class ListTopicsRequest extends Request {
 		}
 
 		User user = handler.getUser();
-		handler.sendResponse(new ListTopicsResponse(user, pool.getTopics()));
+		handler.sendResponse(new MessageResponse(user, "TOPICS: " + pool.getTopicsAsString()));
 	}
 
 	@Override
