@@ -25,8 +25,7 @@ public class ListTopicsRequest extends Request {
 			return;
 		}
 
-		User user = handler.getUser();
-		handler.sendResponse(new MessageResponse(user, "TOPICS: " + pool.getTopicsAsString()));
+		handler.sendResponse(new MessageResponse(pool.SERVER, "TOPICS: " + pool.getTopicsAsString()));
 	}
 
 	@Override
