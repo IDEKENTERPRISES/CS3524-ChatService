@@ -5,11 +5,11 @@ Welcome to the chat client! This manual will guide you through the basic functio
 ### Connecting to the Server
 
 1. **Launch the client application.**
-2. **Enter the server hostname.** 
-    * This is usually "localhost" if the server is running on the same machine. 
+2. **Enter the server hostname.**
+    * This is usually "localhost" if the server is running on the same machine.
     * You can press enter to use the default hostname.
 3. **Enter the server port number.**
-    * The default port is 42069. 
+    * The default port is 42069.
     * You can press enter to use the default port.
 
 ### Registering a Username
@@ -19,14 +19,14 @@ Welcome to the chat client! This manual will guide you through the basic functio
     ```
     REGISTER <username>
     ```
-    * Replace `<username>` with your desired username. 
+    * Replace `<username>` with your desired username.
 
 ### Sending Messages
 
 * Once you are registered, you can send messages to other users.
 
 **Global Messages:**
-* To send a message to all connected users, simply type your message and press enter. 
+* To send a message to all connected users, simply type your message and press enter.
 
 **Targeted Messages:**
 * To send a message to a specific user, use the following command:
@@ -36,6 +36,11 @@ Welcome to the chat client! This manual will guide you through the basic functio
     * Replace `<username>` with the target user's username.
     * Replace `<message>` with the message you want to send.
 
+* Alternatively, you can use the more specialized command:
+```
+SENDUSER <username>
+```
+
 **Group Messages:**
 * To send a message to a specific group, use the following command:
     ```
@@ -43,6 +48,11 @@ Welcome to the chat client! This manual will guide you through the basic functio
     ```
     * Replace `<groupname>` with the target group's name.
     * Replace `<message>` with the message you want to send.
+
+* Alternatively, you can use a the more specialized command:
+```
+SENDGROUP <groupname>
+```
 
 ### Creating and Joining Groups
 
@@ -90,6 +100,8 @@ Welcome to the chat client! This manual will guide you through the basic functio
     TOPICS
     ```
 
+
+
 ### Exiting the Client
 
 * To exit the client, type the following command and press enter:
@@ -97,11 +109,21 @@ Welcome to the chat client! This manual will guide you through the basic functio
     EXIT
     ```
 
+### List online users
+```
+LIST
+```
+
+### List online users in a group
+```
+LISTGROUP <groupname>
+```
+
 ### Additional Notes
 
 * All commands are case-insensitive.
 * You can use the up and down arrow keys to navigate through your command history.
-* The server will automatically disconnect you if you are idle for too long. 
+* The server will automatically disconnect you if you are idle for too long.
 
 
 ***Enjoy your chat!***
